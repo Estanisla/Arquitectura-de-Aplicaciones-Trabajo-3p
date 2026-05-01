@@ -38,8 +38,9 @@ jobs:
       - name: Ensure rolldown Linux native binding
         if: runner.os == 'Linux'
         run: |
-          npm install --no-save --workspace frontend @rolldown/binding-linux-x64-gnu@1.0.0-rc.17
-          test -f frontend/node_modules/@rolldown/binding-linux-x64-gnu/rolldown-binding.linux-x64-gnu.node
+          cd frontend
+          npm install --no-save @rolldown/binding-linux-x64-gnu@1.0.0-rc.17
+          test -f node_modules/@rolldown/binding-linux-x64-gnu/rolldown-binding.linux-x64-gnu.node
 
       - run: npm run lint
       - run: npm run build
