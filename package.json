@@ -1,0 +1,18 @@
+{
+  "name": "arquitectura-de-aplicaciones-trabajo-3p",
+  "private": true,
+  "version": "0.1.0",
+  "workspaces": [
+    "frontend",
+    "backend"
+  ],
+  "scripts": {
+    "dev:frontend": "npm run dev --workspace frontend",
+    "dev:backend": "npm run dev --workspace backend",
+    "build": "npm run build --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
+    "lint": "npm run lint --workspaces --if-present",
+    "audit": "npm audit --workspaces --audit-level=high",
+    "check": "npm run build && npm run test && npm run audit"
+  }
+}
