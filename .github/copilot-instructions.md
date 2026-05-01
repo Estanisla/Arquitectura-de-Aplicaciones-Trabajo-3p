@@ -35,18 +35,25 @@ Current implemented flow:
 4. Backend auth module (`modules/auth`) validates input and calls Supabase RPC `user_login`.
 5. No direct SQL exists in frontend/backend code; database logic stays in PostgreSQL functions.
 
-## CI/CD quality gate
+## CI/CD pipeline (current workflow source of truth)
 
-Use this quality gate sequence:
+Use `.github/workflows/node.js.yml` as the canonical CI behavior.
 
-1. Environment is prepared (download/install dependencies).
-2. Code coherence is validated (logical consistency checks).
-3. Code style/order is validated (format and lint consistency).
-4. System tests are executed.
-5. Security analysis is executed (known dependency vulnerabilities).
-6. Final build is generated to confirm compilation succeeds.
-7. If any gate fails, reject/fix before merge.
-8. If all gates pass, integrate the change.
+Current pipeline sequence:
+
+1. Trigger: `push` to any branch (`'**'`).
+2. Runtime: `ubuntu-latest` + Node.js `20` in every job.
+3. `prepare` job: checkout repository and setup Node.
+4. `backend` job (needs `prepare`): `backend/` -> `npm install`, `npm run typecheck`, `npm run build`.
+5. `frontend` job (needs `prepare`): `frontend/` -> `npm install`, `npm run lint`, `npm run build`.
+6. `security` job (needs `prepare`): `backend/` -> `npm audit --audit-level=moderate` (reports vulnerabilities without failing the job).
+7. `result` job (needs `backend`, `frontend`, and `security`, `if: always()`): fails pipeline if backend or frontend failed; otherwise prints pass.
+
+Operational rules for CI updates:
+
+1. Keep workflow commands Linux-compatible (bash/Ubuntu), even if local development is on Windows.
+2. Keep monorepo boundaries explicit through `working-directory` per workspace.
+3. Keep frontend validation aligned with workspace scripts (`lint` + `build`) unless workflow policy is intentionally changed.
 
 ## Product direction and pending user stories
 
@@ -106,7 +113,7 @@ When implementing requested features, follow these project-specific rules:
 
 ## Key conventions
 
-- Keep changes compatible with `main`-branch CI triggers (`push` and `pull_request` to `main`).
-- Preserve Node version matrix compatibility (`18.x`, `20.x`, `22.x`) unless intentionally updated.
-- Prefer deterministic installs with `npm ci` (not `npm install`) in CI-facing changes.
-- Build is optional by design (`--if-present`), so introducing a `build` script is safe without changing workflow logic.
+- Keep changes compatible with current CI trigger behavior (`push` to any branch) unless workflow is explicitly updated.
+- Preserve CI runtime compatibility with `ubuntu-latest` and Node.js `20` unless intentionally updated in workflow.
+- Keep CI steps aligned with monorepo workspace scope (`backend/` and `frontend/` jobs with explicit `working-directory`).
+- Build remains optional at root via `--if-present`, while current CI enforces backend and frontend build explicitly.
