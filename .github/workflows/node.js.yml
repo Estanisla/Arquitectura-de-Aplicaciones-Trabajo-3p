@@ -54,7 +54,7 @@ jobs:
 
       - name: Install dependencies
         working-directory: frontend
-        run: npm ci --include=optional
+        run: npm install --include=optional
 
       - name: Lint
         working-directory: frontend
