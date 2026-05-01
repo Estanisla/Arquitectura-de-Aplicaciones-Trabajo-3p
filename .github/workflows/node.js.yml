@@ -31,5 +31,10 @@ jobs:
           frontend/package-lock.json
           backend/package-lock.json
     - run: npm install
+    - name: Ensure rolldown Linux native binding
+      if: runner.os == 'Linux'
+      run: |
+        npm install --no-save --workspace frontend @rolldown/binding-linux-x64-gnu@1.0.0-rc.17
+        test -f frontend/node_modules/@rolldown/binding-linux-x64-gnu/rolldown-binding.linux-x64-gnu.node
     - run: npm run build
     - run: npm test
