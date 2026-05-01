@@ -45,4 +45,51 @@ jobs:
       - run: npm run lint
       - run: npm run build
       - run: npm test
+      - run: npm run audit# Node.js CI for monorepo workspaces
+
+name: Node.js CI
+
+on:
+  workflow_dispatch: {}
+  push:
+    branches:
+      - "main"
+      - "feature/**"
+  pull_request:
+    branches:
+      - "main"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [20.x, 22.x]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: "npm"
+          cache-dependency-path: |
+            package-lock.json
+            frontend/package-lock.json
+            backend/package-lock.json
+
+      - run: npm install
+
+      - name: Ensure rolldown Linux native binding
+        if: runner.os == 'Linux'
+        run: |
+          cd frontend
+          npm install --no-save @rolldown/binding-linux-x64-gnu@1.0.0-rc.17
+          test -f node_modules/@rolldown/binding-linux-x64-gnu/rolldown-binding.linux-x64-gnu.node
+
+      - run: npm run lint
+      - run: npm run build
+      - run: npm test
       - run: npm run audit
