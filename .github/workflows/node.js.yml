@@ -30,9 +30,6 @@ jobs:
           package-lock.json
           frontend/package-lock.json
           backend/package-lock.json
-    - run: npm ci
-    - name: Fix rolldown optional binding on Linux
-      if: runner.os == 'Linux'
-      run: npm install --no-save --workspace frontend @rolldown/binding-linux-x64-gnu
+    - run: npm install
     - run: npm run build
     - run: npm test
