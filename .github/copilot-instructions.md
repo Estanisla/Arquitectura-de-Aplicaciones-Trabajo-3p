@@ -8,6 +8,8 @@ Use workspace commands from repository root:
 - Lint all workspaces: `npm run lint`
 - Build all workspaces: `npm run build`
 - Run test suite: `npm run test`
+- Run vulnerability audit: `npm run audit`
+- Run full manual gate: `npm run check`
 
 Workspace-level commands:
 
@@ -33,19 +35,18 @@ Current implemented flow:
 4. Backend auth module (`modules/auth`) validates input and calls Supabase RPC `user_login`.
 5. No direct SQL exists in frontend/backend code; database logic stays in PostgreSQL functions.
 
-## CI/CD flow expected for this project
+## CI/CD quality gate
 
-Use this quality gate sequence for every incoming change:
+Use this quality gate sequence:
 
-1. A developer pushes a change.
-2. Environment is prepared automatically (download/install dependencies).
-3. Code coherence is validated (logical consistency checks).
-4. Code style/order is validated (format and lint consistency).
-5. System tests are executed.
-6. Security analysis is executed (known dependency vulnerabilities).
-7. Final build is generated to confirm compilation succeeds.
-8. If any gate fails, reject the change automatically.
-9. If all gates pass, integrate the change.
+1. Environment is prepared (download/install dependencies).
+2. Code coherence is validated (logical consistency checks).
+3. Code style/order is validated (format and lint consistency).
+4. System tests are executed.
+5. Security analysis is executed (known dependency vulnerabilities).
+6. Final build is generated to confirm compilation succeeds.
+7. If any gate fails, reject/fix before merge.
+8. If all gates pass, integrate the change.
 
 ## Product direction and pending user stories
 
