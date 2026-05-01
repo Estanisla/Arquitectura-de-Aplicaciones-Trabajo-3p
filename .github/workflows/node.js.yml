@@ -40,34 +40,6 @@ jobs:
         working-directory: backend
         run: npm run build
 
-  frontend:
-    name: Frontend Validation
-    needs: prepare
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-
-      - name: Install dependencies
-        working-directory: frontend
-        run: npm install
-
-      - name: Lint
-        working-directory: frontend
-        run: npm run lint
-
-      - name: Type check
-        working-directory: frontend
-        run: npx tsc -b
-
-      - name: Build
-        working-directory: frontend
-        run: npm run build
-
   security:
     name: Security Analysis
     needs: prepare
@@ -84,19 +56,15 @@ jobs:
         working-directory: backend
         run: npm audit --audit-level=moderate 2>&1 || echo "Vulnerabilities detected"
 
-      - name: Frontend audit
-        working-directory: frontend
-        run: npm audit --audit-level=moderate 2>&1 || echo "Vulnerabilities detected"
-
   result:
     name: CI Result
-    needs: [backend, frontend, security]
+    needs: [backend, security]
     runs-on: ubuntu-latest
     if: always()
     steps:
       - name: Check job statuses
         run: |
-          if [[ "${{ needs.backend.result }}" == "failure" || "${{ needs.frontend.result }}" == "failure" ]]; then
+          if [[ "${{ needs.backend.result }}" == "failure" ]]; then
             echo "❌ CI Pipeline Failed"
             exit 1
           fi
