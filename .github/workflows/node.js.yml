@@ -29,7 +29,9 @@ jobs:
 
       # 1) Environment prepared
       - name: Install dependencies
-        run: npm install
+        run: |
+          npm install --include=optional
+          npm install --include=optional --workspace frontend
 
       # 2) Code coherence
       - name: Coherence check (typecheck)
