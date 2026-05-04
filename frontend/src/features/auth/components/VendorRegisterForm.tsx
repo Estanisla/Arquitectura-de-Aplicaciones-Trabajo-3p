@@ -1,40 +1,50 @@
 import { useState } from 'react'
 import type { FormEvent } from 'react'
 import { Link } from 'react-router-dom'
-import { loginVendor } from '../api/loginVendor'
-import type { VendorLoginResult } from '../types'
+import { registerVendor } from '../api/registerVendor'
+import type { VendorRegisterResult } from '../types'
 
 type FormStatus = 'idle' | 'loading' | 'error'
 
-type VendorLoginFormProps = {
-  onSuccess: (result: VendorLoginResult) => void | Promise<void>
-  initialFeedback?: string
+type VendorRegisterFormProps = {
+  onSuccess: (result: VendorRegisterResult) => void | Promise<void>
 }
 
 const initialCredentials = {
   username: '',
   password: '',
+  confirmPassword: '',
 }
 
-export function VendorLoginForm({
-  onSuccess,
-  initialFeedback = '',
-}: VendorLoginFormProps) {
+export function VendorRegisterForm({ onSuccess }: VendorRegisterFormProps) {
   const [credentials, setCredentials] = useState(initialCredentials)
   const [status, setStatus] = useState<FormStatus>('idle')
-  const [feedback, setFeedback] = useState(initialFeedback)
+  const [feedback, setFeedback] = useState('')
 
-  const updateField = (field: 'username' | 'password', value: string) => {
+  const updateField = (
+    field: 'username' | 'password' | 'confirmPassword',
+    value: string,
+  ) => {
     setCredentials((prev) => ({ ...prev, [field]: value }))
   }
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
+
+    if (credentials.password !== credentials.confirmPassword) {
+      setStatus('error')
+      setFeedback('Las contraseñas no coinciden')
+      return
+    }
+
     setStatus('loading')
     setFeedback('')
 
     try {
-      const result = await loginVendor(credentials)
+      const result = await registerVendor({
+        username: credentials.username,
+        password: credentials.password,
+      })
 
       if (!result.ok) {
         setStatus('error')
@@ -43,11 +53,9 @@ export function VendorLoginForm({
       }
 
       await onSuccess(result)
-      setStatus('idle')
-      setFeedback('')
     } catch (error) {
       const message =
-        error instanceof Error ? error.message : 'Error inesperado en login'
+        error instanceof Error ? error.message : 'Error inesperado en registro'
       setStatus('error')
       setFeedback(message)
     }
@@ -55,7 +63,7 @@ export function VendorLoginForm({
 
   return (
     <form className="card form-grid" onSubmit={handleSubmit}>
-      <h2>Login vendedor</h2>
+      <h2>Create account (vendedor)</h2>
 
       <label className="field">
         <span>Usuario</span>
@@ -76,14 +84,27 @@ export function VendorLoginForm({
           name="password"
           value={credentials.password}
           onChange={(event) => updateField('password', event.target.value)}
-          autoComplete="current-password"
+          autoComplete="new-password"
+          minLength={6}
+          required
+        />
+      </label>
+
+      <label className="field">
+        <span>Confirmar password</span>
+        <input
+          type="password"
+          name="confirmPassword"
+          value={credentials.confirmPassword}
+          onChange={(event) => updateField('confirmPassword', event.target.value)}
+          autoComplete="new-password"
           minLength={6}
           required
         />
       </label>
 
       <button type="submit" className="button-link" disabled={status === 'loading'}>
-        {status === 'loading' ? 'Validando...' : 'Ingresar'}
+        {status === 'loading' ? 'Creando cuenta...' : 'Crear cuenta'}
       </button>
 
       {feedback && (
@@ -93,9 +114,9 @@ export function VendorLoginForm({
       )}
 
       <p className="auth-secondary-link">
-        Acceso company-admin:{' '}
-        <Link to="/auth/lg-admin" className="inline-link">
-          /auth/lg-admin
+        ¿Ya tienes cuenta?{' '}
+        <Link to="/auth/login" className="inline-link">
+          Ir a login
         </Link>
       </p>
     </form>
