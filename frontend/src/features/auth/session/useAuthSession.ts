@@ -2,7 +2,7 @@ import { useContext } from 'react'
 import {
   AuthSessionContext,
   type AuthSessionContextValue,
-} from './AuthSessionContext'
+} from './AuthSessionContext.tsx'
 
 export const useAuthSession = (): AuthSessionContextValue => {
   const context = useContext(AuthSessionContext)
