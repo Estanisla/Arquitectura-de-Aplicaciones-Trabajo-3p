@@ -10,7 +10,7 @@ import { getVendorSession, logoutVendor } from '../api/sessionVendor'
 import {
   AuthSessionContext,
   type AuthSessionContextValue,
-} from './AuthSessionContext'
+} from './AuthSessionContext.tsx'
 
 type AuthSessionStatus = 'loading' | 'authenticated' | 'anonymous'
 
