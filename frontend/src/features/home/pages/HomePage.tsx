@@ -3,39 +3,36 @@ import { Link } from 'react-router-dom'
 export function HomePage() {
   return (
     <section className="card-stack">
-      <article className="card">
-        <h2>Base de aplicacion</h2>
+      <article className="card landing-hero">
+        <h2>Marketplace para clientes y vendedores</h2>
         <p>
-          Frontend alineado a arquitectura por modulos. Esta base prioriza login
-          vendedor y separacion de placeholders por rol.
+          Esta pagina principal es publica para cualquier usuario. El acceso de
+          vendedores se realiza con los botones de la parte superior derecha:
+          <strong> Login</strong> y <strong>Create account</strong>.
+        </p>
+        <p>
+          El registro de cuenta esta disponible solo para vendedores. Los
+          company-admin tienen un acceso separado y no usan auto-registro.
+        </p>
+        <p>
+          Si eres company-admin, entra por{' '}
+          <Link to="/auth/lg-admin" className="inline-link">
+            /auth/lg-admin
+          </Link>
+          .
         </p>
       </article>
 
       <article className="card">
-        <h2>Flujo vendedor</h2>
+        <h2>Funcionalidades activas</h2>
         <p>
-          Integra <code>POST /api/auth/login</code> contra backend para validar
-          credenciales actuales.
+          El proyecto actualmente soporta onboarding vendedor (registro + login)
+          y mantiene la separacion entre area vendedor y area company-admin.
         </p>
-        <Link to="/auth/login" className="button-link">
-          Ir a login vendedor
-        </Link>
-      </article>
-
-      <article className="card">
-        <h2>Rutas por rol</h2>
         <p>
-          Seccion vendedor y company-admin quedan separadas desde esta iteracion
-          con placeholders listos para siguientes historias.
+          Login vendedor consume <code>POST /api/auth/login</code> y registro
+          vendedor consume <code>POST /api/auth/register</code>.
         </p>
-        <div className="button-row">
-          <Link to="/vendor" className="button-link">
-            Ver vendedor
-          </Link>
-          <Link to="/admin" className="button-link">
-            Ver company-admin
-          </Link>
-        </div>
       </article>
     </section>
   )
