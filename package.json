@@ -11,8 +11,10 @@
     "react-dom": "19.2.5"
   },
   "scripts": {
+    "preinstall": "node ./scripts/preinstall.mjs",
     "dev:frontend": "npm run dev --workspace frontend",
     "dev:backend": "npm run dev --workspace backend",
+    "loc:no-db": "node ./scripts/count-loc-no-db.mjs",
     "build": "npm run build --workspaces --if-present",
     "test": "npm run test --workspaces --if-present",
     "lint": "npm run lint --workspaces --if-present",

@@ -21,6 +21,18 @@ export const authService = {
         }
         return authRepository.loginWithRpc({ username, password });
     },
+    async adminLogin(payload) {
+        const username = normalize(payload.username);
+        const password = payload.password;
+        // Stricter minimum for admins matches SQL (>= 10).
+        if (!username) {
+            return { ok: false, message: "username requerido" };
+        }
+        if (!password || password.length < 10) {
+            return { ok: false, message: "password minimo 10 caracteres" };
+        }
+        return authRepository.adminLoginWithRpc({ username, password });
+    },
     async register(payload) {
         const username = normalize(payload.username);
         const password = payload.password;

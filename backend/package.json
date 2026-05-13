@@ -4,6 +4,7 @@
   "description": "Node API for login and future modules",
   "main": "dist/server.js",
   "scripts": {
+    "preinstall": "node ../scripts/preinstall.mjs",
     "dev": "tsx watch src/server.ts",
     "build": "tsc -p tsconfig.json",
     "start": "node dist/server.js",

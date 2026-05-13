@@ -22,7 +22,8 @@ export function RequireRoleRoute({
   }
 
   if (status === 'anonymous') {
-    return <Navigate to="/auth/login" replace />
+    const redirectTo = allowedRoles.includes('admin') ? '/auth/lg-admin' : '/auth/login'
+    return <Navigate to={redirectTo} replace />
   }
 
   if (!role || !allowedRoles.includes(role)) {

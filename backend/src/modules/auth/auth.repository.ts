@@ -9,7 +9,7 @@ import type {
 } from "./auth.types.js";
 
 const runAuthRpc = async (
-  functionName: "user_login" | "user_create",
+  functionName: "user_login" | "user_create" | "admin_login",
   payload: AuthRequest,
 ): Promise<AuthResult> => {
   const { data, error } = await supabase.rpc(functionName, {
@@ -27,6 +27,10 @@ const runAuthRpc = async (
 export const authRepository = {
   async loginWithRpc(payload: LoginRequest): Promise<LoginResult> {
     return (await runAuthRpc("user_login", payload)) as LoginResult;
+  },
+
+  async adminLoginWithRpc(payload: LoginRequest): Promise<AuthResult> {
+    return (await runAuthRpc("admin_login", payload)) as AuthResult;
   },
 
   async registerWithRpc(payload: RegisterRequest): Promise<RegisterResult> {

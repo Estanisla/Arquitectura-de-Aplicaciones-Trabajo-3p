@@ -24,7 +24,7 @@ begin
   insert into public.users(username, password_hash)
   values (
     trim(p_username),
-    crypt(p_password, gen_salt('bf'))
+    extensions.crypt(p_password, extensions.gen_salt('bf'))
   )
   returning id into v_user_id;
 
@@ -66,7 +66,7 @@ begin
     return jsonb_build_object('ok', false, 'message', 'Usuario no encontrado');
   end if;
 
-  if crypt(p_password, v_user.password_hash) <> v_user.password_hash then
+  if extensions.crypt(p_password, v_user.password_hash) <> v_user.password_hash then
     return jsonb_build_object('ok', false, 'message', 'Credenciales invalidas');
   end if;
 
