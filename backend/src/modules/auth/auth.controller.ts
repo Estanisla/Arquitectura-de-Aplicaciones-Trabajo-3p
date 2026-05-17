@@ -36,6 +36,29 @@ export const authController = {
     }
   },
 
+  async adminLogin(req: Request<unknown, unknown, LoginBody>, res: Response) {
+    try {
+      const result = await authService.adminLogin({
+        username: req.body.username ?? "",
+        password: req.body.password ?? "",
+      });
+
+      if (!result.ok) {
+        return res.status(401).json(result);
+      }
+
+      if (result.admin_id) {
+        setSessionCookie(res, result.admin_id, "admin");
+      }
+
+      return res.status(200).json(result);
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : "Unknown admin login error";
+      return res.status(500).json({ ok: false, message });
+    }
+  },
+
   async register(req: Request<unknown, unknown, LoginBody>, res: Response) {
     try {
       const result = await authService.register({

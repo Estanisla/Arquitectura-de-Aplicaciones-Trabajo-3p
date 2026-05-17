@@ -1,6 +1,9 @@
 import { useState } from 'react'
 import type { FormEvent } from 'react'
 import { Link } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
+import { loginAdmin } from '../api/loginAdmin'
+import { useAuthSession } from '../session/useAuthSession'
 
 const initialCredentials = {
   username: '',
@@ -10,16 +13,31 @@ const initialCredentials = {
 export function AdminLoginPage() {
   const [credentials, setCredentials] = useState(initialCredentials)
   const [feedback, setFeedback] = useState('')
+  const navigate = useNavigate()
+  const { refreshSession } = useAuthSession()
 
   const updateField = (field: 'username' | 'password', value: string) => {
     setCredentials((prev) => ({ ...prev, [field]: value }))
   }
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
-    setFeedback(
-      'Login company-admin separado activo en UI. Integracion backend admin pendiente.',
-    )
+
+    try {
+      setFeedback('')
+      const result = await loginAdmin(credentials)
+
+      if (!result.ok) {
+        setFeedback(result.message)
+        return
+      }
+
+      await refreshSession()
+      navigate('/admin', { replace: true })
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Error de login'
+      setFeedback(message)
+    }
   }
 
   return (
@@ -50,7 +68,7 @@ export function AdminLoginPage() {
           value={credentials.password}
           onChange={(event) => updateField('password', event.target.value)}
           autoComplete="current-password"
-          minLength={6}
+          minLength={10}
           required
         />
       </label>
