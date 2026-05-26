@@ -13,6 +13,9 @@ export const authRepository = {
     async loginWithRpc(payload) {
         return (await runAuthRpc("user_login", payload));
     },
+    async adminLoginWithRpc(payload) {
+        return (await runAuthRpc("admin_login", payload));
+    },
     async registerWithRpc(payload) {
         return (await runAuthRpc("user_create", payload));
     },

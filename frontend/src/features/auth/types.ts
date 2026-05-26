@@ -9,6 +9,7 @@ export type VendorAuthResult = {
   ok: boolean
   message: string
   user_id?: string
+  admin_id?: string
 }
 
 export type VendorSessionResult = {

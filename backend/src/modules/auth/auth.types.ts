@@ -9,6 +9,7 @@ export type AuthResult = {
   ok: boolean;
   message: string;
   user_id?: string;
+  admin_id?: string;
 };
 
 export type SessionResult = {
