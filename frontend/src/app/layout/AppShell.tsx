@@ -8,7 +8,7 @@ export function AppShell() {
     <div className="app-shell">
       <header className="app-shell__header app-shell__header--public">
         <Link to="/" className="app-shell__brand">
-          Marketplace App
+          Polos Azules
         </Link>
         <nav className="app-shell__actions" aria-label="Acceso vendedor">
           {status === 'loading' ? (
@@ -18,14 +18,9 @@ export function AppShell() {
               Perfil
             </Link>
           ) : (
-            <>
-              <Link to="/auth/login" className="button-link button-link--secondary">
-                Login
-              </Link>
-              <Link to="/auth/register" className="button-link">
-                Create account
-              </Link>
-            </>
+            <Link to="/auth/login" className="button-link button-link--secondary">
+              Login
+            </Link>
           )}
         </nav>
       </header>
