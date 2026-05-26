@@ -134,7 +134,7 @@ export function HomePage() {
       </section>
 
       <footer className="pa-footer">
-        © 2025 Polos Azules · Todos los derechos reservados
+        © 2025 Plos Azules · Todos los derechos reservados
       </footer>
     </div>
   )
