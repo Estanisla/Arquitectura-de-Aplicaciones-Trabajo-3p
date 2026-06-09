@@ -17,8 +17,12 @@
     "loc:no-db": "node ./scripts/count-loc-no-db.mjs",
     "build": "npm run build --workspaces --if-present",
     "test": "npm run test --workspaces --if-present",
+    "test:coverage": "npm run test:coverage --workspaces --if-present",
     "lint": "npm run lint --workspaces --if-present",
     "audit": "npm audit --workspaces --audit-level=high",
     "check": "npm run build && npm run test && npm run audit"
+  },
+  "devDependencies": {
+    "tsx": "^4.22.4"
   }
 }
