@@ -25,7 +25,7 @@ export const authController = {
       if (!result.ok) {
         return res.status(401).json(result);
       }
-      setSessionCookie(res, result.user_id, "vendor");
+      setSessionCookie(res, result.user_id!, "vendor");
       return res.status(200).json(result);
     } catch (error) {
       return res.status(500).json({ ok: false, message: getErrorMessage(error, "Unknown login error") });
@@ -41,7 +41,7 @@ export const authController = {
       if (!result.ok) {
         return res.status(401).json(result);
       }
-      setSessionCookie(res, result.admin_id, "admin");
+      setSessionCookie(res, result.admin_id!, "admin");
       return res.status(200).json(result);
     } catch (error) {
       return res.status(500).json({ ok: false, message: getErrorMessage(error, "Unknown admin login error") });
