@@ -1,85 +1,68 @@
 name: CI Pipeline
-
 on:
   push:
     branches: ['**']
-
 jobs:
   prepare:
     name: Environment Setup
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-
   backend:
     name: Backend Validation
     needs: prepare
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-
       - name: Install dependencies
         working-directory: backend
         run: npm install
-
       - name: Type check
         working-directory: backend
         run: npm run typecheck
-
       - name: Build
         working-directory: backend
         run: npm run build
-
   frontend:
     name: Frontend Validation
     needs: prepare
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-
       - name: Install dependencies
         working-directory: frontend
         run: npm install
-
       - name: Lint
         working-directory: frontend
         run: npm run lint
-
       - name: Build
         working-directory: frontend
         run: npm run build
-
   security:
     name: Security Analysis
     needs: prepare
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-
       - name: Backend audit
         working-directory: backend
         run: npm audit --audit-level=moderate 2>&1 || echo "Vulnerabilities detected"
-
   result:
     name: CI Result
     needs: [backend, frontend, security]
@@ -93,3 +76,17 @@ jobs:
             exit 1
           fi
           echo "✅ CI Pipeline Passed"
+
+  deploy:
+    name: Deploy to Render
+    needs: result
+    runs-on: ubuntu-latest
+    if: success()
+    steps:
+      - name: Trigger Render deploy hook (development)
+        if: github.ref != 'refs/heads/main'
+        run: curl -X POST ${{ secrets.DEVELOPMENT }}
+
+      - name: Trigger Render deploy hook (production)
+        if: github.ref == 'refs/heads/main'
+        run: curl -X POST ${{ secrets.PRODUCTION }}
