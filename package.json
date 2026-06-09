@@ -21,5 +21,8 @@
     "lint": "npm run lint --workspaces --if-present",
     "audit": "npm audit --workspaces --audit-level=high",
     "check": "npm run build && npm run test && npm run audit"
+  },
+  "devDependencies": {
+    "tsx": "^4.22.4"
   }
 }

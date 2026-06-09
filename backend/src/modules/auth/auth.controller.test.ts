@@ -94,6 +94,25 @@ test("authController.login returns 401 for invalid credentials", async () => {
   assert.equal(state.cookies.length, 0);
 });
 
+test("authController.login returns 500 when the service throws", async () => {
+  mock.method(authService, "login", async () => {
+    throw new Error("rpc exploded");
+  });
+
+  const { response, state } = createResponse();
+
+  await authController.login(
+    { body: { username: "alice", password: "secret1" } } as never,
+    response as never,
+  );
+
+  assert.equal(state.statusCode, 500);
+  assert.deepEqual(state.jsonBody, {
+    ok: false,
+    message: "rpc exploded",
+  });
+});
+
 test("authController.register returns 201 on success and 400 on validation failure", async () => {
   mock.method(authService, "register", async ({ username }) => {
     if (username === "bad-user") {
@@ -148,6 +167,61 @@ test("authController.adminLogin returns 200 and sets an admin cookie on success"
   });
   assert.equal(state.cookies.length, 1);
   assert.equal(state.cookies[0]?.name, sessionCookieName);
+});
+
+test("authController.adminLogin returns 401 for invalid credentials", async () => {
+  mock.method(authService, "adminLogin", async () => ({
+    ok: false,
+    message: "Credenciales invalidas",
+  }));
+
+  const { response, state } = createResponse();
+
+  await authController.adminLogin(
+    { body: { username: "root", password: "wrong" } } as never,
+    response as never,
+  );
+
+  assert.equal(state.statusCode, 401);
+  assert.equal(state.cookies.length, 0);
+});
+
+test("authController.adminLogin returns 500 when the service throws", async () => {
+  mock.method(authService, "adminLogin", async () => {
+    throw new Error("admin rpc exploded");
+  });
+
+  const { response, state } = createResponse();
+
+  await authController.adminLogin(
+    { body: { username: "root", password: "secret1234" } } as never,
+    response as never,
+  );
+
+  assert.equal(state.statusCode, 500);
+  assert.deepEqual(state.jsonBody, {
+    ok: false,
+    message: "admin rpc exploded",
+  });
+});
+
+test("authController.adminLogin returns 500 when the service throws a non-Error", async () => {
+  mock.method(authService, "adminLogin", async () => {
+    throw "string error";
+  });
+
+  const { response, state } = createResponse();
+
+  await authController.adminLogin(
+    { body: { username: "root", password: "secret1234" } } as never,
+    response as never,
+  );
+
+  assert.equal(state.statusCode, 500);
+  assert.deepEqual(state.jsonBody, {
+    ok: false,
+    message: "Unknown admin login error",
+  });
 });
 
 test("authController.session returns authenticated session details when the cookie is valid", () => {
@@ -209,9 +283,9 @@ test("authController.logout clears the session cookie", () => {
   assert.equal(state.clearedCookies[0]?.name, sessionCookieName);
 });
 
-test("authController.login returns 500 when the service throws", async () => {
+test("authController.login returns 500 when the service throws a non-Error", async () => {
   mock.method(authService, "login", async () => {
-    throw new Error("rpc exploded");
+    throw "string error";
   });
 
   const { response, state } = createResponse();
@@ -224,6 +298,25 @@ test("authController.login returns 500 when the service throws", async () => {
   assert.equal(state.statusCode, 500);
   assert.deepEqual(state.jsonBody, {
     ok: false,
-    message: "rpc exploded",
+    message: "Unknown login error",
+  });
+});
+
+test("authController.register returns 500 when the service throws a non-Error", async () => {
+  mock.method(authService, "register", async () => {
+    throw "string error";
+  });
+
+  const { response, state } = createResponse();
+
+  await authController.register(
+    { body: { username: "alice", password: "secret1" } } as never,
+    response as never,
+  );
+
+  assert.equal(state.statusCode, 500);
+  assert.deepEqual(state.jsonBody, {
+    ok: false,
+    message: "Unknown register error",
   });
 });
