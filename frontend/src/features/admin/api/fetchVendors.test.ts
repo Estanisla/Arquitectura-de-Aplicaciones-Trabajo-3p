@@ -64,4 +64,35 @@ describe('fetchVendors', () => {
 
     await expect(fetchVendors()).rejects.toThrow('No autorizado')
   })
+
+  it('uses fallback message when result.message is missing', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue(
+        new Response(
+          JSON.stringify({ ok: false }),
+          { status: 500 },
+        ),
+      ),
+    )
+
+    await expect(fetchVendors()).rejects.toThrow(
+      'Error al obtener vendedores',
+    )
+  })
+
+  it('returns empty array when vendors field is missing', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue(
+        new Response(
+          JSON.stringify({ ok: true }),
+          { status: 200 },
+        ),
+      ),
+    )
+
+    const result = await fetchVendors()
+    expect(result).toEqual([])
+  })
 })

@@ -15,7 +15,6 @@ export function AdminPanelPage() {
 
   const loadVendors = useCallback(async () => {
     try {
-      setStatus('loading')
       const data = await fetchVendors()
       setVendors(data)
       setStatus('ready')
@@ -28,7 +27,10 @@ export function AdminPanelPage() {
   }, [])
 
   useEffect(() => {
-    void loadVendors()
+    const init = async () => {
+      await loadVendors()
+    }
+    void init()
   }, [loadVendors])
 
   const handleDeactivate = async (vendorId: string) => {
@@ -38,10 +40,10 @@ export function AdminPanelPage() {
     const confirmed = window.confirm(
       `Desactivar la tienda "${vendor.display_name}"?`,
     )
-
     if (!confirmed) return
 
     try {
+      setActionFeedback('')
       const result = await deactivateVendor(vendorId)
       if (!result.ok) {
         setActionFeedback(result.message)
@@ -86,11 +88,9 @@ export function AdminPanelPage() {
         <h2>Panel company-admin</h2>
         <p>Gestion de vendedores y tiendas.</p>
       </article>
-
       <article className="card">
         <CreateVendorForm onCreated={loadVendors} />
       </article>
-
       <article className="card">
         <h3>Vendedores registrados ({vendors.length})</h3>
         {actionFeedback && (

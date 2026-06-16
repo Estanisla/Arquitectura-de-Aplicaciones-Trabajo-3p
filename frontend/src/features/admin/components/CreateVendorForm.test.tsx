@@ -5,6 +5,7 @@ import { CreateVendorForm } from './CreateVendorForm.tsx'
 
 afterEach(() => {
   cleanup()
+  vi.unstubAllGlobals() // Limpia los stubs globales de fetch entre tests
   vi.restoreAllMocks()
 })
 
@@ -25,6 +26,24 @@ describe('CreateVendorForm', () => {
     expect(
       screen.getByLabelText('Descripcion (opcional)'),
     ).toBeInTheDocument()
+  })
+
+  it('renders description textarea with empty value initially', () => {
+    render(<CreateVendorForm onCreated={vi.fn()} />)
+
+    const textarea = screen.getByLabelText('Descripcion (opcional)')
+    expect(textarea).toHaveValue('')
+  })
+
+  it('updates description field when user types', async () => {
+    const user = userEvent.setup()
+    render(<CreateVendorForm onCreated={vi.fn()} />)
+
+    const textarea = screen.getByLabelText('Descripcion (opcional)')
+    await user.type(textarea, 'Nueva descripcion de prueba')
+
+    // Esto fuerza a que se lea la rama izquierda del operador ?? al actualizar el estado
+    expect(textarea).toHaveValue('Nueva descripcion de prueba')
   })
 
   it('shows validation error for short username', async () => {
@@ -122,6 +141,10 @@ describe('CreateVendorForm', () => {
       screen.getByLabelText('Nombre de tienda'),
       'Mi Tienda',
     )
+    await user.type(
+      screen.getByLabelText('Descripcion (opcional)'),
+      'Descripcion de tienda',
+    )
     await user.click(
       screen.getByRole('button', { name: 'Crear vendedor' }),
     )
@@ -129,6 +152,94 @@ describe('CreateVendorForm', () => {
     expect(
       await screen.findByText('tempPass123'),
     ).toBeInTheDocument()
+  })
+
+  it('shows error when fetch throws', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockRejectedValue(new Error('Error de conexion')),
+    )
+
+    const user = userEvent.setup()
+    render(<CreateVendorForm onCreated={vi.fn()} />)
+
+    await user.type(screen.getByLabelText('Username'), 'validuser')
+    await user.type(
+      screen.getByLabelText('Contrasena temporal'),
+      'temp123',
+    )
+    await user.type(
+      screen.getByLabelText('Nombre de tienda'),
+      'Mi Tienda',
+    )
+    await user.click(
+      screen.getByRole('button', { name: 'Crear vendedor' }),
+    )
+
+    expect(
+      await screen.findByText('Error de conexion'),
+    ).toBeInTheDocument()
+  })
+
+  it('shows fallback error when fetch throws a non-Error', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockRejectedValue('string error'),
+    )
+
+    const user = userEvent.setup()
+    render(<CreateVendorForm onCreated={vi.fn()} />)
+
+    await user.type(screen.getByLabelText('Username'), 'validuser')
+    await user.type(
+      screen.getByLabelText('Contrasena temporal'),
+      'temp123',
+    )
+    await user.type(
+      screen.getByLabelText('Nombre de tienda'),
+      'Mi Tienda',
+    )
+    await user.click(
+      screen.getByRole('button', { name: 'Crear vendedor' }),
+    )
+
+    expect(
+      await screen.findByText('Error inesperado'),
+    ).toBeInTheDocument()
+  })
+
+  it('does not call onCreated when API returns ok without userId/vendorId', async () => {
+    const onCreated = vi.fn()
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue(
+        new Response(
+          JSON.stringify({ ok: true, message: 'Creado' }),
+          { status: 201 },
+        ),
+      ),
+    )
+
+    const user = userEvent.setup()
+    render(<CreateVendorForm onCreated={onCreated} />)
+
+    await user.type(screen.getByLabelText('Username'), 'newvendor')
+    await user.type(
+      screen.getByLabelText('Contrasena temporal'),
+      'tempPass123',
+    )
+    await user.type(
+      screen.getByLabelText('Nombre de tienda'),
+      'Mi Tienda',
+    )
+    await user.click(
+      screen.getByRole('button', { name: 'Crear vendedor' }),
+    )
+
+    expect(
+      await screen.findByText('Vendedor creado correctamente'),
+    ).toBeInTheDocument()
+    expect(onCreated).not.toHaveBeenCalled()
   })
 
   it('shows error when API returns ok false', async () => {

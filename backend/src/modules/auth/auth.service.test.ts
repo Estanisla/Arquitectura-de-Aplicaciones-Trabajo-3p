@@ -36,6 +36,23 @@ test("authService.login trims username before calling repository", async () => {
   });
 });
 
+test("authService.login rejects empty password without calling repository", async () => {
+  const loginMock = mock.method(authRepository, "loginWithRpcV2", async () => {
+    throw new Error("repository should not be called");
+  });
+
+  const result = await authService.login({
+    username: "alice",
+    password: "",
+  });
+
+  assert.deepEqual(result, {
+    ok: false,
+    message: "password minimo 6 caracteres",
+  });
+  assert.equal(loginMock.mock.calls.length, 0);
+});
+
 test("authService.login rejects empty username without calling repository", async () => {
   const loginMock = mock.method(authRepository, "loginWithRpcV2", async () => {
     throw new Error("repository should not be called");
@@ -51,6 +68,44 @@ test("authService.login rejects empty username without calling repository", asyn
     message: "username requerido",
   });
   assert.equal(loginMock.mock.calls.length, 0);
+});
+
+test("authService.adminLogin rejects empty password", async () => {
+  const adminLoginMock = mock.method(authRepository, "adminLoginWithRpc", async () => {
+    throw new Error("repository should not be called");
+  });
+
+  const result = await authService.adminLogin({
+    username: "admin",
+    password: "",
+  });
+
+  assert.deepEqual(result, {
+    ok: false,
+    message: "password minimo 10 caracteres",
+  });
+  assert.equal(adminLoginMock.mock.calls.length, 0);
+});
+
+test("authService.adminLogin succeeds with valid credentials", async () => {
+  const adminLoginMock = mock.method(authRepository, "adminLoginWithRpc", async (payload) => ({
+    ok: true,
+    message: `admin login for ${payload.username}`,
+    admin_id: "admin-1",
+  }));
+
+  const result = await authService.adminLogin({
+    username: "admin",
+    password: "secret1234",
+  });
+
+  assert.equal(result.ok, true);
+  assert.equal(result.admin_id, "admin-1");
+  assert.equal(adminLoginMock.mock.calls.length, 1);
+  assert.deepEqual(adminLoginMock.mock.calls[0]?.arguments[0], {
+    username: "admin",
+    password: "secret1234",
+  });
 });
 
 test("authService.adminLogin enforces the admin password minimum", async () => {

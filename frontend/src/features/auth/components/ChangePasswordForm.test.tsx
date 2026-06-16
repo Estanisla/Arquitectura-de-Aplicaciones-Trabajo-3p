@@ -75,6 +75,83 @@ describe('ChangePasswordForm', () => {
     ).toBeInTheDocument()
   })
 
+  it('shows error when API returns ok false', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue(
+        new Response(
+          JSON.stringify({ ok: false, message: 'Contrasena actual incorrecta' }),
+          { status: 400 },
+        ),
+      ),
+    )
+
+    const user = userEvent.setup()
+    render(<ChangePasswordForm onSuccess={vi.fn()} />)
+
+    await user.type(screen.getByLabelText('Contrasena actual'), 'wrong')
+    await user.type(screen.getByLabelText('Nueva contrasena'), 'new456')
+    await user.type(
+      screen.getByLabelText('Confirmar nueva contrasena'),
+      'new456',
+    )
+    await user.click(
+      screen.getByRole('button', { name: 'Cambiar contrasena' }),
+    )
+
+    expect(
+      await screen.findByText('Contrasena actual incorrecta'),
+    ).toBeInTheDocument()
+  })
+
+  it('shows error when fetch throws', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockRejectedValue(new Error('Error de red')),
+    )
+
+    const user = userEvent.setup()
+    render(<ChangePasswordForm onSuccess={vi.fn()} />)
+
+    await user.type(screen.getByLabelText('Contrasena actual'), 'old123')
+    await user.type(screen.getByLabelText('Nueva contrasena'), 'new456')
+    await user.type(
+      screen.getByLabelText('Confirmar nueva contrasena'),
+      'new456',
+    )
+    await user.click(
+      screen.getByRole('button', { name: 'Cambiar contrasena' }),
+    )
+
+    expect(
+      await screen.findByText('Error de red'),
+    ).toBeInTheDocument()
+  })
+
+  it('shows fallback error when fetch throws a non-Error', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockRejectedValue('string error'),
+    )
+
+    const user = userEvent.setup()
+    render(<ChangePasswordForm onSuccess={vi.fn()} />)
+
+    await user.type(screen.getByLabelText('Contrasena actual'), 'old123')
+    await user.type(screen.getByLabelText('Nueva contrasena'), 'new456')
+    await user.type(
+      screen.getByLabelText('Confirmar nueva contrasena'),
+      'new456',
+    )
+    await user.click(
+      screen.getByRole('button', { name: 'Cambiar contrasena' }),
+    )
+
+    expect(
+      await screen.findByText('Error inesperado'),
+    ).toBeInTheDocument()
+  })
+
   it('calls onSuccess on API success', async () => {
     const onSuccess = vi.fn()
     vi.stubGlobal(
