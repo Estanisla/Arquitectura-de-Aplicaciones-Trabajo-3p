@@ -12,6 +12,10 @@ export type AuthResult = {
   admin_id?: string;
 };
 
+export type LoginResultV2 = AuthResult & {
+  must_change_password?: boolean;
+};
+
 export type SessionResult = {
   ok: boolean;
   authenticated: boolean;
@@ -29,4 +33,14 @@ export type RegisterResult = AuthResult;
 export type SessionPayload = {
   sub: string;
   role: AuthRole;
+};
+
+export type ChangePasswordRequest = {
+  currentPassword: string;
+  newPassword: string;
+};
+
+export type ChangePasswordResult = {
+  ok: boolean;
+  message: string;
 };

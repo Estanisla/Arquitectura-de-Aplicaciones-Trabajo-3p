@@ -250,6 +250,30 @@ test("authController.session returns authenticated session details when the cook
   });
 });
 
+test("authController.session returns anonymous when cookie has no role", () => {
+  const token = jwt.sign({}, jwtSecret, {
+    subject: "admin-1",
+    expiresIn: "12h",
+  });
+  const { response, state } = createResponse();
+
+  authController.session(
+    {
+      cookies: {
+        [sessionCookieName]: token,
+      },
+    } as never,
+    response as never,
+  );
+
+  assert.equal(state.statusCode, 200);
+  assert.deepEqual(state.jsonBody, {
+    ok: true,
+    authenticated: false,
+    message: "Sin sesion activa",
+  });
+});
+
 test("authController.session returns an anonymous payload without a valid session", () => {
   const { response, state } = createResponse();
 
@@ -302,6 +326,25 @@ test("authController.login returns 500 when the service throws a non-Error", asy
   });
 });
 
+test("authController.register returns 500 when the service throws an Error", async () => {
+  mock.method(authService, "register", async () => {
+    throw new Error("register exploded");
+  });
+
+  const { response, state } = createResponse();
+
+  await authController.register(
+    { body: { username: "alice", password: "secret1" } } as never,
+    response as never,
+  );
+
+  assert.equal(state.statusCode, 500);
+  assert.deepEqual(state.jsonBody, {
+    ok: false,
+    message: "register exploded",
+  });
+});
+
 test("authController.register returns 500 when the service throws a non-Error", async () => {
   mock.method(authService, "register", async () => {
     throw "string error";
@@ -320,3 +363,127 @@ test("authController.register returns 500 when the service throws a non-Error", 
     message: "Unknown register error",
   });
 });
+
+test("authController.login includes mustChangePassword in response", async () => {
+  mock.method(authService, "login", async () => ({
+    ok: true,
+    message: "Login correcto",
+    user_id: "vendor-1",
+    must_change_password: true,
+  }));
+
+  const { response, state } = createResponse();
+
+  await authController.login(
+    { body: { username: "alice", password: "secret1" } } as never,
+    response as never,
+  );
+
+  assert.equal(state.statusCode, 200);
+  assert.deepEqual(state.jsonBody, {
+    ok: true,
+    message: "Login correcto",
+    user_id: "vendor-1",
+    must_change_password: true,
+  });
+});
+
+test("authController.changePassword returns 200 on success", async () => {
+  mock.method(authService, "changePassword", async () => {});
+
+  const { response, state } = createResponse();
+
+  const token = jwt.sign({ role: "vendor" }, jwtSecret, {
+    subject: "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
+    expiresIn: "12h",
+  });
+
+  await authController.changePassword(
+    {
+      cookies: { [sessionCookieName]: token },
+      body: { currentPassword: "oldpass", newPassword: "newpass123" },
+    } as never,
+    response as never,
+  );
+
+  assert.equal(state.statusCode, 200);
+  assert.deepEqual(state.jsonBody, {
+    ok: true,
+    message: "Contrasena actualizada correctamente",
+  });
+});
+
+test("authController.changePassword returns 401 without valid session", async () => {
+  const { response, state } = createResponse();
+
+  await authController.changePassword(
+    {
+      cookies: {},
+      body: { currentPassword: "oldpass", newPassword: "newpass123" },
+    } as never,
+    response as never,
+  );
+
+  assert.equal(state.statusCode, 401);
+  assert.deepEqual(state.jsonBody, {
+    ok: false,
+    message: "Sesion no valida",
+  });
+});
+
+test("authController.changePassword returns 400 when service throws AppError", async () => {
+  const { AppError } = await import("../../shared/AppError.ts");
+
+  mock.method(authService, "changePassword", async () => {
+    throw new AppError("La nueva contrasena debe tener al menos 6 caracteres", 400);
+  });
+
+  const { response, state } = createResponse();
+
+  const token = jwt.sign({ role: "vendor" }, jwtSecret, {
+    subject: "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
+    expiresIn: "12h",
+  });
+
+  await authController.changePassword(
+    {
+      cookies: { [sessionCookieName]: token },
+      body: { currentPassword: "oldpass", newPassword: "short" },
+    } as never,
+    response as never,
+  );
+
+  assert.equal(state.statusCode, 400);
+  assert.deepEqual(state.jsonBody, {
+    ok: false,
+    message: "La nueva contrasena debe tener al menos 6 caracteres",
+  });
+});
+
+test("authController.changePassword returns 500 when service throws a generic Error", async () => {
+  mock.method(authService, "changePassword", async () => {
+    throw new Error("generic error");
+  });
+
+  const { response, state } = createResponse();
+
+  const token = jwt.sign({ role: "vendor" }, jwtSecret, {
+    subject: "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
+    expiresIn: "12h",
+  });
+
+  await authController.changePassword(
+    {
+      cookies: { [sessionCookieName]: token },
+      body: { currentPassword: "oldpass", newPassword: "newpass123" },
+    } as never,
+    response as never,
+  );
+
+  assert.equal(state.statusCode, 500);
+  assert.deepEqual(state.jsonBody, {
+    ok: false,
+    message: "generic error",
+  });
+});
+
