@@ -10,6 +10,17 @@ export type VendorAuthResult = {
   message: string
   user_id?: string
   admin_id?: string
+  must_change_password?: boolean
+}
+
+export type ChangePasswordRequest = {
+  currentPassword: string
+  newPassword: string
+}
+
+export type ChangePasswordResult = {
+  ok: boolean
+  message: string
 }
 
 export type VendorSessionResult = {

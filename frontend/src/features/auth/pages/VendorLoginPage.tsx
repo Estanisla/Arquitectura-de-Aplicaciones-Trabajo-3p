@@ -1,5 +1,6 @@
 import { Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { VendorLoginForm } from '../components/VendorLoginForm'
+import type { VendorLoginResult } from '../types'
 import { useAuthSession } from '../session/useAuthSession'
 
 type LoginRouteState = {
@@ -30,8 +31,14 @@ export function VendorLoginPage() {
     return <Navigate to="/profile" replace />
   }
 
-  const handleSuccess = async () => {
+  const handleSuccess = async (result: VendorLoginResult) => {
     await refreshSession()
+
+    if (result.must_change_password) {
+      navigate('/auth/change-password', { replace: true })
+      return
+    }
+
     navigate('/profile', { replace: true })
   }
 

@@ -1,4 +1,5 @@
 import type { Request, Response } from "express";
+import { AppError } from "../../shared/AppError.js";
 import {
   clearSessionCookie,
   readSessionRoleFromRequest,
@@ -10,6 +11,11 @@ import { authService } from "./auth.service.js";
 type LoginBody = {
   username?: string;
   password?: string;
+};
+
+type ChangePasswordBody = {
+  currentPassword?: string;
+  newPassword?: string;
 };
 
 const getErrorMessage = (error: unknown, fallback: string) =>
@@ -87,5 +93,33 @@ export const authController = {
     return res
       .status(200)
       .json({ ok: true, message: "Sesion cerrada", authenticated: false });
+  },
+
+  async changePassword(
+    req: Request,
+    res: Response,
+  ) {
+    try {
+      const userId = readSessionUserIdFromRequest(req);
+
+      if (!userId) {
+        return res.status(401).json({ ok: false, message: "Sesion no valida" });
+      }
+
+      const body = req.body as ChangePasswordBody;
+
+      await authService.changePassword(
+        userId,
+        body.currentPassword ?? "",
+        body.newPassword ?? "",
+      );
+
+      return res.status(200).json({ ok: true, message: "Contrasena actualizada correctamente" });
+    } catch (error) {
+      if (error instanceof AppError) {
+        return res.status(error.status).json({ ok: false, message: error.message });
+      }
+      return res.status(500).json({ ok: false, message: getErrorMessage(error, "Error al cambiar contrasena") });
+    }
   },
 };

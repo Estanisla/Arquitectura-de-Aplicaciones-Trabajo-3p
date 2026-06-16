@@ -5,8 +5,11 @@ import { VendorLoginPage } from '../features/auth/pages/VendorLoginPage'
 import { VendorRegisterPage } from '../features/auth/pages/VendorRegisterPage'
 import { AdminLoginPage } from '../features/auth/pages/AdminLoginPage'
 import { HomePage } from '../features/home/pages/HomePage'
+import { VendorListPage } from '../features/vendors/pages/VendorListPage'
+import { VendorStorePage } from '../features/vendors/pages/VendorStorePage'
 import { VendorAreaPlaceholderPage } from '../features/vendor/pages/VendorAreaPlaceholderPage'
-import { AdminAreaPlaceholderPage } from '../features/admin/pages/AdminAreaPlaceholderPage'
+import { AdminPanelPage } from '../features/admin/pages/AdminPanelPage'
+import { ChangePasswordPage } from '../features/auth/pages/ChangePasswordPage'
 import { ProfilePage } from '../features/profile/pages/ProfilePage'
 
 export function App() {
@@ -14,9 +17,12 @@ export function App() {
     <Routes>
       <Route element={<AppShell />}>
         <Route index element={<HomePage />} />
+        <Route path="/tiendas" element={<VendorListPage />} />
+        <Route path="/tiendas/:vendorId" element={<VendorStorePage />} />
         <Route path="/auth/login" element={<VendorLoginPage />} />
         <Route path="/auth/register" element={<VendorRegisterPage />} />
         <Route path="/auth/lg-admin" element={<AdminLoginPage />} />
+        <Route path="/auth/change-password" element={<ChangePasswordPage />} />
         <Route path="/profile" element={<ProfilePage />} />
         <Route
           path="/vendor"
@@ -30,7 +36,7 @@ export function App() {
           path="/admin"
           element={
             <RequireRoleRoute allowedRoles={['admin']}>
-              <AdminAreaPlaceholderPage />
+              <AdminPanelPage />
             </RequireRoleRoute>
           }
         />

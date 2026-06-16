@@ -5,6 +5,8 @@ import path from "path";
 import { fileURLToPath } from "url";
 import { env } from "./config/env.js";
 import { authRouter } from "./modules/auth/auth.routes.js";
+import { vendorRouter } from "./modules/vendors/vendor.routes.js";
+import { adminPanelRouter } from "./modules/admin-panel/admin-panel.routes.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -25,6 +27,8 @@ app.get("/api/health", (_req, res) => {
 });
 
 app.use("/api/auth", authRouter);
+app.use("/api/vendors", vendorRouter);
+app.use("/api/admin", adminPanelRouter);
 
 // Serve frontend static files
 const frontendDist = path.join(__dirname, "../../frontend/dist");

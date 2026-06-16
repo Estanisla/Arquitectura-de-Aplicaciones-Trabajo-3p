@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<coverage generated="1781578245877" clover="3.2.0">
+  <project timestamp="1781578245877" name="All files">
+    <metrics statements="68" coveredstatements="66" conditionals="54" coveredconditionals="42" methods="19" coveredmethods="17" elements="141" coveredelements="125" complexity="0" loc="68" ncloc="68" packages="5" files="8" classes="8"/>
+    <package name="auth.api">
+      <metrics statements="7" coveredstatements="7" conditionals="2" coveredconditionals="2" methods="1" coveredmethods="1"/>
+      <file name="parseAuthResponse.ts" path="C:\Users\Estanislao\Desktop\Trabajo_Arqui\Arquitectura-de-Aplicaciones-Trabajo-3p\frontend\src\features\auth\api\parseAuthResponse.ts">
+        <metrics statements="7" coveredstatements="7" conditionals="2" coveredconditionals="2" methods="1" coveredmethods="1"/>
+        <line num="3" count="1" type="stmt"/>
+        <line num="7" count="3" type="stmt"/>
+        <line num="9" count="3" type="cond" truecount="2" falsecount="0"/>
+        <line num="10" count="1" type="stmt"/>
+        <line num="13" count="2" type="stmt"/>
+        <line num="14" count="2" type="stmt"/>
+        <line num="16" count="1" type="stmt"/>
+      </file>
+    </package>
+    <package name="home.components">
+      <metrics statements="22" coveredstatements="21" conditionals="10" coveredconditionals="8" methods="6" coveredmethods="5"/>
+      <file name="VendorList.tsx" path="C:\Users\Estanislao\Desktop\Trabajo_Arqui\Arquitectura-de-Aplicaciones-Trabajo-3p\frontend\src\features\home\components\VendorList.tsx">
+        <metrics statements="22" coveredstatements="21" conditionals="10" coveredconditionals="8" methods="6" coveredmethods="5"/>
+        <line num="7" count="7" type="stmt"/>
+        <line num="8" count="7" type="stmt"/>
+        <line num="9" count="7" type="stmt"/>
+        <line num="11" count="7" type="stmt"/>
+        <line num="12" count="4" type="stmt"/>
+        <line num="14" count="4" type="stmt"/>
+        <line num="16" count="2" type="cond" truecount="1" falsecount="1"/>
+        <line num="17" count="2" type="stmt"/>
+        <line num="18" count="2" type="stmt"/>
+        <line num="22" count="1" type="cond" truecount="1" falsecount="1"/>
+        <line num="23" count="1" type="stmt"/>
+        <line num="24" count="1" type="stmt"/>
+        <line num="28" count="4" type="stmt"/>
+        <line num="29" count="0" type="stmt"/>
+        <line num="33" count="7" type="cond" truecount="2" falsecount="0"/>
+        <line num="34" count="4" type="stmt"/>
+        <line num="37" count="3" type="cond" truecount="2" falsecount="0"/>
+        <line num="38" count="1" type="stmt"/>
+        <line num="45" count="2" type="cond" truecount="2" falsecount="0"/>
+        <line num="46" count="1" type="stmt"/>
+        <line num="53" count="1" type="stmt"/>
+        <line num="56" count="1" type="stmt"/>
+      </file>
+    </package>
+    <package name="vendors.api">
+      <metrics statements="10" coveredstatements="10" conditionals="8" coveredconditionals="8" methods="2" coveredmethods="2"/>
+      <file name="fetchVendorList.ts" path="C:\Users\Estanislao\Desktop\Trabajo_Arqui\Arquitectura-de-Aplicaciones-Trabajo-3p\frontend\src\features\vendors\api\fetchVendorList.ts">
+        <metrics statements="4" coveredstatements="4" conditionals="2" coveredconditionals="2" methods="1" coveredmethods="1"/>
+        <line num="4" count="3" type="stmt"/>
+        <line num="5" count="3" type="cond" truecount="2" falsecount="0"/>
+        <line num="6" count="2" type="stmt"/>
+        <line num="7" count="2" type="stmt"/>
+      </file>
+      <file name="fetchVendorProfile.ts" path="C:\Users\Estanislao\Desktop\Trabajo_Arqui\Arquitectura-de-Aplicaciones-Trabajo-3p\frontend\src\features\vendors\api\fetchVendorProfile.ts">
+        <metrics statements="6" coveredstatements="6" conditionals="6" coveredconditionals="6" methods="1" coveredmethods="1"/>
+        <line num="4" count="5" type="stmt"/>
+        <line num="5" count="5" type="cond" truecount="2" falsecount="0"/>
+        <line num="6" count="4" type="cond" truecount="2" falsecount="0"/>
+        <line num="7" count="3" type="cond" truecount="2" falsecount="0"/>
+        <line num="8" count="2" type="stmt"/>
+        <line num="9" count="2" type="stmt"/>
+      </file>
+    </package>
+    <package name="vendors.components">
+      <metrics statements="8" coveredstatements="8" conditionals="18" coveredconditionals="12" methods="5" coveredmethods="5"/>
+      <file name="VendorCard.tsx" path="C:\Users\Estanislao\Desktop\Trabajo_Arqui\Arquitectura-de-Aplicaciones-Trabajo-3p\frontend\src\features\vendors\components\VendorCard.tsx">
+        <metrics statements="2" coveredstatements="2" conditionals="4" coveredconditionals="4" methods="2" coveredmethods="2"/>
+        <line num="10" count="6" type="stmt"/>
+        <line num="19" count="2" type="stmt"/>
+      </file>
+      <file name="VendorProductGrid.tsx" path="C:\Users\Estanislao\Desktop\Trabajo_Arqui\Arquitectura-de-Aplicaciones-Trabajo-3p\frontend\src\features\vendors\components\VendorProductGrid.tsx">
+        <metrics statements="4" coveredstatements="4" conditionals="6" coveredconditionals="4" methods="2" coveredmethods="2"/>
+        <line num="8" count="3" type="cond" truecount="2" falsecount="0"/>
+        <line num="9" count="2" type="stmt"/>
+        <line num="12" count="1" type="stmt"/>
+        <line num="15" count="2" type="stmt"/>
+      </file>
+      <file name="VendorProductPreview.tsx" path="C:\Users\Estanislao\Desktop\Trabajo_Arqui\Arquitectura-de-Aplicaciones-Trabajo-3p\frontend\src\features\vendors\components\VendorProductPreview.tsx">
+        <metrics statements="2" coveredstatements="2" conditionals="8" coveredconditionals="4" methods="1" coveredmethods="1"/>
+        <line num="9" count="2" type="cond" truecount="2" falsecount="2"/>
+        <line num="13" count="2" type="stmt"/>
+      </file>
+    </package>
+    <package name="vendors.pages">
+      <metrics statements="21" coveredstatements="20" conditionals="16" coveredconditionals="12" methods="5" coveredmethods="4"/>
+      <file name="VendorStorePage.tsx" path="C:\Users\Estanislao\Desktop\Trabajo_Arqui\Arquitectura-de-Aplicaciones-Trabajo-3p\frontend\src\features\vendors\pages\VendorStorePage.tsx">
+        <metrics statements="21" coveredstatements="20" conditionals="16" coveredconditionals="12" methods="5" coveredmethods="4"/>
+        <line num="13" count="11" type="stmt"/>
+        <line num="14" count="11" type="stmt"/>
+        <line num="16" count="11" type="stmt"/>
+        <line num="17" count="6" type="cond" truecount="1" falsecount="1"/>
+        <line num="19" count="6" type="stmt"/>
+        <line num="21" count="6" type="stmt"/>
+        <line num="23" count="3" type="cond" truecount="1" falsecount="1"/>
+        <line num="24" count="3" type="stmt"/>
+        <line num="28" count="2" type="cond" truecount="1" falsecount="1"/>
+        <line num="29" count="2" type="cond" truecount="1" falsecount="1"/>
+        <line num="30" count="2" type="stmt"/>
+        <line num="34" count="6" type="stmt"/>
+        <line num="35" count="0" type="stmt"/>
+        <line num="39" count="11" type="cond" truecount="2" falsecount="0"/>
+        <line num="40" count="6" type="stmt"/>
+        <line num="43" count="5" type="cond" truecount="2" falsecount="0"/>
+        <line num="44" count="2" type="cond" truecount="2" falsecount="0"/>
+        <line num="45" count="1" type="stmt"/>
+        <line num="47" count="1" type="stmt"/>
+        <line num="50" count="3" type="stmt"/>
+        <line num="52" count="3" type="stmt"/>
+      </file>
+    </package>
+  </project>
+</coverage>
