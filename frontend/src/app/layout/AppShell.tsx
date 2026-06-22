@@ -1,8 +1,14 @@
-import { Link, Outlet } from 'react-router-dom'
+import { Link, Outlet, useNavigate } from 'react-router-dom'
 import { useAuthSession } from '../../features/auth/session/useAuthSession'
 
 export function AppShell() {
-  const { status, isAuthenticated } = useAuthSession()
+  const navigate = useNavigate()
+  const { status, isAuthenticated, logout } = useAuthSession()
+
+  const handleLogout = async () => {
+    await logout()
+    navigate('/', { replace: true })
+  }
 
   return (
     <div className="app-shell">
@@ -14,9 +20,18 @@ export function AppShell() {
           {status === 'loading' ? (
             <span className="app-shell__loading-text">Cargando sesion...</span>
           ) : isAuthenticated ? (
-            <Link to="/profile" className="button-link">
-              Perfil
-            </Link>
+            <>
+              <Link to="/profile" className="button-link">
+                Perfil
+              </Link>
+              <button
+                type="button"
+                className="button-link button-link--secondary"
+                onClick={handleLogout}
+              >
+                Cerrar sesión
+              </button>
+            </>
           ) : (
             <Link to="/auth/login" className="button-link button-link--secondary">
               Login
