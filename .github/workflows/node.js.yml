@@ -91,6 +91,7 @@ jobs:
         run: npm run build
 
       - name: Start backend server
+        working-directory: backend
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
