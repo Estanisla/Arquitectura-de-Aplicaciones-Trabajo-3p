@@ -71,7 +71,7 @@ jobs:
     name: DAST - OWASP ZAP
     needs: [backend, frontend, security]
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    if: github.event_name == 'push'
 
     steps:
       - name: Checkout codigo
