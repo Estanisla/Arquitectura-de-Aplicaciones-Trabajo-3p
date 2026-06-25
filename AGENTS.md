@@ -1,5 +1,12 @@
 # Agents instructions for this repository
 
+## Agent workflow rules
+
+- **File by file**: Before editing any file, state what you're about to change and why. After editing, summarize what you changed. Do not batch-silence edits.
+- **Ask before acting**: If a task is ambiguous, ask. If a change touches architecture or crosses module boundaries, ask. Do not assume.
+- **Conciseness**: Be direct. If you cannot do something, say "I can't do X because Y" — no preamble, no apology.
+- **One story at a time**: Never mix features. Finish one complete story (SQL + backend + frontend + tests) before touching another.
+
 ## Build, test, and lint commands
 
 Use workspace commands from repository root:
@@ -57,6 +64,10 @@ SQL files live in `database/queries/` and are numbered in execution order:
 06_admins.sql                  — public.admins, public.admin_logs, triggers, guards, admin_create, admin_login, admin_soft_delete, admin_hard_delete + grants
 07_vendors_and_products.sql    — public.vendors, public.vendor_logs, public.products, public.product_logs, triggers, guards
 08_vendor_product_functions_and_grants.sql — get_vendor_list_with_products, get_vendor_profile, vendor_create + grants
+09_must_change_password.sql    — must_change_password column, change_password function + grants
+10_admin_panel_functions_and_grants.sql — admin_create_vendor, admin_list_vendors, admin_deactivate_vendor + grants
+11_vendor_dashboard_functions_and_grants.sql — get_my_vendor_profile, vendor_update_profile + grants
+12_product_crud.sql            — _assert_vendor_ownership, vendor_get_my_products, product_create/update/soft_delete/hard_delete + grants
 ```
 
 ### Table summary
@@ -98,7 +109,7 @@ Every new table must have:
 - `REVOKE ALL ON TABLE public.<table> FROM anon, authenticated` at the end of the file.
 
 Every new RPC function must have explicit grants:
-- `REVOKE ALL ON FUNCTION ... FROM anon, authenticated` before granting.
+- `REVOKE ALL ON FUNCTION ... FROM anon, authenticated, public` before granting (PostgreSQL grants EXECUTE to `public` by default).
 - `GRANT EXECUTE ON FUNCTION ... TO <role>` after.
 - Public read functions: grant to `anon, authenticated`.
 - Write/admin functions: grant only to `authenticated` or `service_role` as appropriate.
@@ -131,8 +142,10 @@ Shared utilities live in `backend/src/shared/`. `AppError` (with `message` and `
 
 ### Implemented backend modules
 
-- `modules/auth` — `user_login`, `user_create`, `admin_login`, session cookie management.
+- `modules/auth` — `user_login`, `user_create`, `admin_login`, `change_password`, session cookie management.
 - `modules/vendors` — `GET /api/vendors`, `GET /api/vendors/:vendorId`. Public, no auth required.
+- `modules/admin-panel` — `GET /api/admin/vendors`, `POST /api/admin/vendors`, `PATCH /api/admin/vendors/:vendorId/deactivate`. Protected by admin role.
+- `modules/vendor-dashboard` — `GET /api/vendor/profile`, `PUT /api/vendor/profile`, `GET /api/vendor/products`, `POST /api/vendor/products`, `PUT /api/vendor/products/:productId`, `DELETE /api/vendor/products/:productId` (soft/hard). Protected by vendor role.
 
 ### Backend rules
 
@@ -165,9 +178,12 @@ App-level concerns live in `frontend/src/app/`:
 
 ### Implemented frontend features
 
-- `features/auth` — `VendorLoginForm`, `VendorRegisterForm`, `AuthSessionProvider`, `parseAuthResponse`.
+- `features/auth` — `VendorLoginForm`, `VendorRegisterForm`, `AdminLoginForm`, `ChangePasswordForm`, `AuthSessionProvider`, `parseAuthResponse`.
 - `features/vendors` — `fetchVendorList`, `fetchVendorProfile`, `VendorCard`, `VendorProductPreview`, `VendorProductGrid`, `VendorList`, `VendorStorePage`.
 - `features/home` — `HomePage` (existing marketing landing with hardcoded stores), `VendorList` (dynamic vendor list component).
+- `features/admin` — `fetchVendors`, `createVendor`, `deactivateVendor`, `VendorTable`, `CreateVendorForm`, `DeactivateVendorButton`, `AdminPanelPage`.
+- `features/profile` — `ProfilePage` (logout + session info).
+- `features/vendor` — `VendorAreaPlaceholderPage` (protected route placeholder).
 
 ### Current routes
 
@@ -177,7 +193,9 @@ App-level concerns live in `frontend/src/app/`:
 /tiendas/:vendorId       — VendorStorePage: full product list for one vendor
 /auth/login              — VendorLoginForm
 /auth/register           — VendorRegisterForm
-/auth/lg-admin           — AdminLoginForm (placeholder or implemented)
+/auth/lg-admin           — AdminLoginForm
+/auth/change-password    — ChangePasswordForm
+/profile                 — ProfilePage (logout + session info)
 /vendor                  — protected by RequireRoleRoute (role: vendor)
 /admin                   — protected by RequireRoleRoute (role: admin)
 ```
@@ -254,8 +272,8 @@ CI rules:
 
 Two authenticated roles exist:
 
-- `vendor` — a seller who owns a storefront. Authenticated via `public.users` + `user_login` RPC. Can manage their own products and profile (future).
-- `admin` — company-admin. Authenticated via `public.admins` + `admin_login` RPC. Can moderate reviews and manage vendor display names (future).
+- `vendor` — a seller who owns a storefront. Authenticated via `public.users` + `user_login` RPC. Can manage their own products and profile.
+- `admin` — company-admin. Authenticated via `public.admins` + `admin_login` RPC. Can create/list/deactivate vendors, moderate reviews (future).
 
 Public (unauthenticated) access is allowed for:
 - Reading vendor storefronts (`get_vendor_list_with_products`, `get_vendor_profile`).
@@ -277,7 +295,7 @@ Treat these as approved goals. Implement one story at a time. No bundled feature
 | 2 | As a company, I want customers to contact sellers directly via links or phone. | Pending |
 | 3 | As a seller, I want to show my products in my own storefront. | **Done (public read)** |
 | 4 | As a company, I want to moderate and remove inappropriate reviews. | Pending |
-| 5 | As a seller, I want to manage my storefront after logging in. | Pending |
+| 5 | As a seller, I want to manage my storefront after logging in. | **Done (profile + product CRUD)** |
 
 Story 3 is done for public read (home preview + full storefront page). The private management side (vendor CRUD for products) is part of Story 5.
 
@@ -294,3 +312,4 @@ Story 3 is done for public read (home preview + full storefront page). The priva
 9. If the task conflicts with this architecture, stop and ask Enzo or Fredy for confirmation before coding.
 10. For schema-breaking changes (new auth flows, folder restructures, API contract changes), request explicit approval from Enzo or Fredy first.
 11. After completing a task, verify: `npm run test` passes, coverage stays at or above 80%, and `npm run build` succeeds in both workspaces.
+12. Always include `public` in `REVOKE ... FROM anon, authenticated, public` for RPC functions. PostgreSQL grants EXECUTE to `public` by default, so revoking only from `anon, authenticated` is insufficient.

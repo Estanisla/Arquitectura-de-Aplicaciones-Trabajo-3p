@@ -29,7 +29,7 @@ begin
 end;
 $$;
 
-revoke all on function public._assert_vendor_ownership(uuid, text) from anon, authenticated;
+revoke all on function public._assert_vendor_ownership(uuid, text) from anon, authenticated, public;
 grant execute on function public._assert_vendor_ownership(uuid, text) to authenticated;
 
 -- vendor_get_my_products(vendor_id)
@@ -75,7 +75,7 @@ begin
 end;
 $$;
 
-revoke all on function public.vendor_get_my_products(uuid) from anon, authenticated;
+revoke all on function public.vendor_get_my_products(uuid) from anon, authenticated, public;
 grant execute on function public.vendor_get_my_products(uuid) to authenticated;
 
 -- product_create(vendor_id, name, description, image_url)
@@ -119,7 +119,7 @@ begin
 end;
 $$;
 
-revoke all on function public.product_create(uuid, text, text, text) from anon, authenticated;
+revoke all on function public.product_create(uuid, text, text, text) from anon, authenticated, public;
 grant execute on function public.product_create(uuid, text, text, text) to authenticated;
 
 -- product_update(product_id, name, description, image_url, is_visible)
@@ -171,7 +171,7 @@ begin
 end;
 $$;
 
-revoke all on function public.product_update(uuid, text, text, text, boolean) from anon, authenticated;
+revoke all on function public.product_update(uuid, text, text, text, boolean) from anon, authenticated, public;
 grant execute on function public.product_update(uuid, text, text, text, boolean) to authenticated;
 
 -- product_soft_delete(product_id)
@@ -210,7 +210,7 @@ begin
 end;
 $$;
 
-revoke all on function public.product_soft_delete(uuid) from anon, authenticated;
+revoke all on function public.product_soft_delete(uuid) from anon, authenticated, public;
 grant execute on function public.product_soft_delete(uuid) to authenticated;
 
 -- product_hard_delete(product_id)
@@ -250,5 +250,5 @@ begin
 end;
 $$;
 
-revoke all on function public.product_hard_delete(uuid) from anon, authenticated;
+revoke all on function public.product_hard_delete(uuid) from anon, authenticated, public;
 grant execute on function public.product_hard_delete(uuid) to authenticated;
