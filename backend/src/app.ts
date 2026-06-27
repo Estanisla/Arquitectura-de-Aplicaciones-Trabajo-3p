@@ -8,6 +8,7 @@ import { authRouter } from "./modules/auth/auth.routes.js";
 import { vendorRouter } from "./modules/vendors/vendor.routes.js";
 import { adminPanelRouter } from "./modules/admin-panel/admin-panel.routes.js";
 import { vendorDashboardRouter } from "./modules/vendor-dashboard/vendor-dashboard.routes.js";
+import { reviewsRouter } from "./modules/reviews/reviews.routes.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -27,6 +28,7 @@ app.use("/api/auth", authRouter);
 app.use("/api/vendors", vendorRouter);
 app.use("/api/admin", adminPanelRouter);
 app.use("/api/vendor", vendorDashboardRouter);
+app.use("/api/products", reviewsRouter);
 
 // Serve frontend static files
 const frontendDist = path.join(__dirname, "../../frontend/dist");
