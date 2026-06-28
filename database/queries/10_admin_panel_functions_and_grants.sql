@@ -64,7 +64,7 @@ exception
 end;
 $$;
 
-revoke all on function public.admin_create_vendor(uuid, text, text, text, text) from anon;
+revoke all on function public.admin_create_vendor(uuid, text, text, text, text) from anon, authenticated;
 grant execute on function public.admin_create_vendor(uuid, text, text, text, text) to authenticated;
 
 -- admin_list_vendors(admin_id)
@@ -106,7 +106,7 @@ begin
 end;
 $$;
 
-revoke all on function public.admin_list_vendors(uuid) from anon;
+revoke all on function public.admin_list_vendors(uuid) from anon, authenticated;
 grant execute on function public.admin_list_vendors(uuid) to authenticated;
 
 -- admin_deactivate_vendor(admin_id, vendor_id)
@@ -141,5 +141,5 @@ begin
 end;
 $$;
 
-revoke all on function public.admin_deactivate_vendor(uuid, uuid) from anon;
+revoke all on function public.admin_deactivate_vendor(uuid, uuid) from anon, authenticated;
 grant execute on function public.admin_deactivate_vendor(uuid, uuid) to authenticated;

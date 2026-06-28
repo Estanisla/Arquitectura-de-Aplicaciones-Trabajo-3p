@@ -38,4 +38,6 @@ export const env = {
   JWT_EXPIRES_IN: readStringEnv("JWT_EXPIRES_IN", "12h"),
   SESSION_COOKIE_NAME: readStringEnv("SESSION_COOKIE_NAME", "vendor_session"),
   COOKIE_SECURE: readBooleanEnv("COOKIE_SECURE", false),
+  MONGODB_URI: readStringEnv("MONGODB_URI", "mongodb://localhost:27017"),
+  MONGODB_DB_NAME: readStringEnv("MONGODB_DB_NAME", "estanisrate"),
 };
