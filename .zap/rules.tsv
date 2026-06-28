@@ -1,0 +1,26 @@
+# .zap/rules.tsv
+# Formato: <ID>\t<ACCION>\t# Comentario
+#
+# ACCIONES: IGNORE | WARN | FAIL
+# IGNORE  → no aparece en el reporte
+# WARN    → aparece como advertencia (no falla el job)
+# FAIL    → falla el job (comportamiento por defecto para High)
+#
+# Documentar SIEMPRE el motivo antes de agregar un IGNORE.
+# Un IGNORE sin justificación es una deuda de seguridad.
+
+# ── Informativos de bajo riesgo ────────────────────────────────────────────
+10015	IGNORE	# Incomplete or No Cache-control — aceptable en API sin datos privados en caché
+10027	IGNORE	# Information Disclosure - Suspicious Comments — comentarios en código de lab
+10096	IGNORE	# Timestamp Disclosure — timestamps no son sensibles en este contexto
+10049	IGNORE	# Storable and Cacheable Content — API de lectura pública sin datos personales
+
+# ── Configuración conocida de Django dev ──────────────────────────────────
+10021	WARN	# X-Content-Type-Options — pendiente configurar en settings.py
+10036	WARN	# Server Leakage — header Server expone versión; aceptado en dev, fix en prod
+
+# ── NO IGNORAR — deben fallar ──────────────────────────────────────────────
+# 40012 XSS Reflected    → FAIL (default)
+# 40018 SQL Injection     → FAIL (default)
+# 10202 CSRF             → FAIL (default)
+# 10038 CSP Not Set       → WARN (configurar antes del TF)

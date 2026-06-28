@@ -4,6 +4,12 @@ on:
     branches: ['**']
   pull_request:
     branches: [development, main]
+
+permissions:
+  contents: read
+  security-events: write
+  issues: write
+
 jobs:
   backend:
     name: Backend Validation
@@ -25,6 +31,7 @@ jobs:
       - name: Build
         working-directory: backend
         run: npm run build
+
   frontend:
     name: Frontend Validation
     runs-on: ubuntu-latest
@@ -45,6 +52,7 @@ jobs:
       - name: Build
         working-directory: frontend
         run: npm run build
+
   security:
     name: Security Analysis
     runs-on: ubuntu-latest
@@ -59,19 +67,82 @@ jobs:
         run: npm ci
       - name: Backend audit
         run: npm audit --workspaces --audit-level=moderate 2>&1 || echo "Vulnerabilities detected"
+
+  dast:
+    name: DAST - OWASP ZAP
+    needs: [backend, frontend, security]
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push'
+
+    steps:
+      - name: Checkout codigo
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build backend
+        working-directory: backend
+        run: npm run build
+
+      - name: Start backend server
+        working-directory: backend
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+        run: |
+          node dist/server.js &
+          echo "SERVER_PID=$!" >> $GITHUB_ENV
+          for i in {1..30}; do
+            curl -sf http://localhost:3001/api/health > /dev/null 2>&1 && break
+            echo "Waiting for server... ($i/30)"
+            sleep 2
+          done
+
+      - name: Verify server is running
+        run: |
+          curl -f http://localhost:3001/api/health || (echo "Server is not responding" && exit 1)
+          echo "Backend available at localhost:3001"
+
+      - name: ZAP Baseline Scan
+        uses: zaproxy/action-baseline@v0.14.0
+        with:
+          target: 'http://localhost:3001'
+          rules_file_name: '.zap/rules.tsv'
+          fail_action: false
+          artifact_name: 'zap-baseline-report'
+
+      - name: Upload ZAP report as artifact
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: zap-baseline-report
+          path: |
+            report_html.html
+            report_json.json
+          retention-days: 30
+          overwrite: true
+
   result:
     name: CI Result
-    needs: [backend, frontend, security]
+    needs: [backend, frontend, security, dast]
     runs-on: ubuntu-latest
     if: always()
     steps:
       - name: Check job statuses
         run: |
           if [[ "${{ needs.backend.result }}" == "failure" || "${{ needs.frontend.result }}" == "failure" ]]; then
-            echo "❌ CI Pipeline Failed"
+            echo "CI Pipeline Failed"
             exit 1
           fi
-          echo "✅ CI Pipeline Passed"
+          echo "CI Pipeline Passed"
 
   deploy:
     name: Deploy to Render
