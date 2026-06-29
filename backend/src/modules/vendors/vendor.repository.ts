@@ -1,4 +1,5 @@
 import { supabase } from "../../lib/supabaseClient.js";
+import { AppError } from "../../shared/AppError.js";
 import type { VendorListItem, VendorProfile } from "./vendor.types.js";
 
 type VendorListRpcResponse = {
@@ -18,17 +19,13 @@ export const vendorRepository = {
     const { data, error } = await supabase.rpc("get_vendor_list_with_products", {
       p_preview_limit: previewLimit,
     });
-
     if (error) {
-      throw new Error("Error al obtener lista de vendedores");
+      throw new AppError("Error al obtener lista de vendedores", 500);
     }
-
     const result = data as VendorListRpcResponse | null;
-
     if (!result?.ok) {
-      throw new Error(result?.message ?? "Error al obtener lista de vendedores");
+      throw new AppError(result?.message ?? "Error al obtener lista de vendedores", 500);
     }
-
     return result.data;
   },
 
@@ -36,17 +33,13 @@ export const vendorRepository = {
     const { data, error } = await supabase.rpc("get_vendor_profile", {
       p_vendor_id: vendorId,
     });
-
     if (error) {
-      throw new Error("Error al obtener perfil del vendedor");
+      throw new AppError("Error al obtener perfil del vendedor", 500);
     }
-
     const result = data as VendorProfileRpcResponse | null;
-
     if (!result?.ok) {
       return null;
     }
-
     return result.data;
   },
 };
