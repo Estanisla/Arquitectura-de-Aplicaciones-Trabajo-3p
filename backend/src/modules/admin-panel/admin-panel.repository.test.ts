@@ -6,7 +6,7 @@ process.env.SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY ?? "anon-key";
 process.env.JWT_SECRET = process.env.JWT_SECRET ?? "test-secret";
 
 const { adminPanelRepository } = await import("./admin-panel.repository.ts");
-const { supabase } = await import("../../lib/supabaseClient.ts");
+const { supabaseAdmin } = await import("../../lib/supabaseClient.ts");
 
 afterEach(() => {
   mock.restoreAll();
@@ -15,7 +15,7 @@ afterEach(() => {
 const adminId = "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee";
 
 test("createVendor calls admin_create_vendor with correct params", async () => {
-  const rpcMock = mock.method(supabase, "rpc", async () => ({
+  const rpcMock = mock.method(supabaseAdmin, "rpc", async () => ({
     data: {
       ok: true,
       message: "Vendedor creado correctamente",
@@ -46,7 +46,7 @@ test("createVendor calls admin_create_vendor with correct params", async () => {
 });
 
 test("createVendor returns ok false on unique violation", async () => {
-  mock.method(supabase, "rpc", async () => ({
+  mock.method(supabaseAdmin, "rpc", async () => ({
     data: {
       ok: false,
       message: "El username ya existe",
@@ -65,7 +65,7 @@ test("createVendor returns ok false on unique violation", async () => {
 });
 
 test("listVendors calls admin_list_vendors with admin id", async () => {
-  const rpcMock = mock.method(supabase, "rpc", async () => ({
+  const rpcMock = mock.method(supabaseAdmin, "rpc", async () => ({
     data: {
       ok: true,
       data: [],
@@ -94,7 +94,7 @@ test("listVendors returns vendor array on success", async () => {
     },
   ];
 
-  mock.method(supabase, "rpc", async () => ({
+  mock.method(supabaseAdmin, "rpc", async () => ({
     data: { ok: true, data: vendors },
     error: null,
   }));
@@ -105,7 +105,7 @@ test("listVendors returns vendor array on success", async () => {
 });
 
 test("deactivateVendor calls admin_deactivate_vendor with correct params", async () => {
-  const rpcMock = mock.method(supabase, "rpc", async () => ({
+  const rpcMock = mock.method(supabaseAdmin, "rpc", async () => ({
     data: {
       ok: true,
       message: "Tienda desactivada",
@@ -124,7 +124,7 @@ test("deactivateVendor calls admin_deactivate_vendor with correct params", async
 });
 
 test("all repository methods throw descriptive error when Supabase fails", async () => {
-  mock.method(supabase, "rpc", async () => ({
+  mock.method(supabaseAdmin, "rpc", async () => ({
     data: null,
     error: { message: "connection refused" },
   }));

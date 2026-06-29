@@ -1,4 +1,8 @@
 import { env } from '../../../shared/config/env'
+import {
+  DEFAULT_ERROR_MESSAGE,
+  parseJsonResponse,
+} from '../../../shared/errors/publicErrors'
 import type { ChangePasswordRequest, ChangePasswordResult } from '../types'
 
 export const changePassword = async (
@@ -11,10 +15,10 @@ export const changePassword = async (
     body: JSON.stringify(payload),
   })
 
-  const result: ChangePasswordResult = await response.json()
+  const result = await parseJsonResponse<ChangePasswordResult>(response)
 
-  if (!response.ok && response.status >= 500) {
-    throw new Error(result.message)
+  if (!response.ok || !result.ok) {
+    throw new Error(DEFAULT_ERROR_MESSAGE)
   }
 
   return result

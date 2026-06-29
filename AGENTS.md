@@ -1,5 +1,12 @@
 # Agents instructions for this repository
 
+## Agent workflow rules
+
+- **File by file**: Before editing any file, state what you're about to change and why. After editing, summarize what you changed. Do not batch-silence edits.
+- **Ask before acting**: If a task is ambiguous, ask. If a change touches architecture or crosses module boundaries, ask. Do not assume.
+- **Conciseness**: Be direct. If you cannot do something, say "I can't do X because Y" — no preamble, no apology.
+- **One story at a time**: Never mix features. Finish one complete story (SQL + backend + frontend + tests) before touching another.
+
 ## Build, test, and lint commands
 
 Use workspace commands from repository root:
@@ -57,6 +64,13 @@ SQL files live in `database/queries/` and are numbered in execution order:
 06_admins.sql                  — public.admins, public.admin_logs, triggers, guards, admin_create, admin_login, admin_soft_delete, admin_hard_delete + grants
 07_vendors_and_products.sql    — public.vendors, public.vendor_logs, public.products, public.product_logs, triggers, guards
 08_vendor_product_functions_and_grants.sql — get_vendor_list_with_products, get_vendor_profile, vendor_create + grants
+09_must_change_password.sql    — must_change_password column, change_password function + grants
+10_admin_panel_functions_and_grants.sql — admin_create_vendor, admin_list_vendors, admin_deactivate_vendor + grants
+11_vendor_dashboard_functions_and_grants.sql — get_my_vendor_profile, vendor_update_profile + grants
+12_product_crud.sql            — _assert_vendor_ownership, vendor_get_my_products, product_create/update/soft_delete/hard_delete + grants
+13_emporiums_store_members_and_contacts.sql — one emporium per admin, multiple stores, multi-user store membership, contact channels and admin RPCs
+14_store_operations_for_custom_sessions.sql — service-role RPCs that enforce admin ownership and owner/manager membership for users, contacts and product management
+15_revoke_public_from_store_rpcs.sql — revoke PostgreSQL public execution from all store-management RPCs
 ```
 
 ### Table summary
@@ -68,6 +82,12 @@ SQL files live in `database/queries/` and are numbered in execution order:
 `public.vendors` — public storefront profile for a seller. Columns: `id uuid`, `user_id uuid → public.users(id)`, `display_name text`, `description text`, `is_active boolean`, `created_at`, `updated_at`. One vendor per user (`unique` on `user_id`).
 
 `public.products` — products belonging to a vendor. Columns: `id uuid`, `vendor_id uuid → public.vendors(id)`, `name text`, `description text`, `image_url text`, `is_visible boolean`, `created_at`, `updated_at`.
+
+`public.emporiums` — commercial emporiums. Each company-admin owns one emporium through the unique `admin_id`.
+
+`public.store_members` — associates one or more vendor users with a store using `owner` or `manager` roles. `vendors.user_id` remains as the legacy owner for backward compatibility.
+
+`public.store_contacts` — public direct-contact channels for a store: WhatsApp, Instagram, Facebook, email and website.
 
 `public.user_logs`, `public.admin_logs`, `public.vendor_logs`, `public.product_logs` — audit log tables, same shape: `id bigserial`, `event_time`, `action text`, `table_name text`, `row_id uuid`, `actor text`, `reason text`, `before_data jsonb`, `after_data jsonb`, `txid bigint`.
 
@@ -98,7 +118,7 @@ Every new table must have:
 - `REVOKE ALL ON TABLE public.<table> FROM anon, authenticated` at the end of the file.
 
 Every new RPC function must have explicit grants:
-- `REVOKE ALL ON FUNCTION ... FROM anon, authenticated` before granting.
+- `REVOKE ALL ON FUNCTION ... FROM anon, authenticated, public` before granting.
 - `GRANT EXECUTE ON FUNCTION ... TO <role>` after.
 - Public read functions: grant to `anon, authenticated`.
 - Write/admin functions: grant only to `authenticated` or `service_role` as appropriate.
@@ -131,8 +151,12 @@ Shared utilities live in `backend/src/shared/`. `AppError` (with `message` and `
 
 ### Implemented backend modules
 
-- `modules/auth` — `user_login`, `user_create`, `admin_login`, session cookie management.
+- `modules/auth` — `user_login`, `user_create`, `admin_login`, password changes and session cookie management.
 - `modules/vendors` — `GET /api/vendors`, `GET /api/vendors/:vendorId`. Public, no auth required.
+- `modules/reviews` — anonymous public review reads/creation plus admin-only moderation and logical removal backed by MongoDB.
+- `modules/admin-panel` — admin-only vendor creation, listing, and deactivation.
+- `modules/store-management` — admin-only creation and listing of emporium stores with multiple users and contact channels. Uses Supabase RPCs exclusively.
+- `modules/vendor-dashboard` — owner/manager store dashboard, profile/contact updates, product creation/update/removal and store-scoped review reads.
 
 ### Backend rules
 
@@ -165,9 +189,13 @@ App-level concerns live in `frontend/src/app/`:
 
 ### Implemented frontend features
 
-- `features/auth` — `VendorLoginForm`, `VendorRegisterForm`, `AuthSessionProvider`, `parseAuthResponse`.
+- `features/auth` — vendor/admin login, registration, password changes, `AuthSessionProvider` and `parseAuthResponse`.
 - `features/vendors` — `fetchVendorList`, `fetchVendorProfile`, `VendorCard`, `VendorProductPreview`, `VendorProductGrid`, `VendorList`, `VendorStorePage`.
 - `features/home` — `HomePage` (existing marketing landing with hardcoded stores), `VendorList` (dynamic vendor list component).
+- `features/admin` — vendor management plus review moderation and logical removal. User-facing failures use generic messages and do not expose internal API details.
+- `features/admin` also includes emporium store creation, multi-user membership and direct-contact management.
+- `features/vendor` — owner/manager dashboard for store profile, contacts, product visibility and store reviews.
+- `features/reviews` — public anonymous review list and creation per product.
 
 ### Current routes
 
@@ -177,7 +205,9 @@ App-level concerns live in `frontend/src/app/`:
 /tiendas/:vendorId       — VendorStorePage: full product list for one vendor
 /auth/login              — VendorLoginForm
 /auth/register           — VendorRegisterForm
-/auth/lg-admin           — AdminLoginForm (placeholder or implemented)
+/auth/lg-admin           — AdminLoginForm
+/auth/change-password    — ChangePasswordForm
+/profile                 — ProfilePage
 /vendor                  — protected by RequireRoleRoute (role: vendor)
 /admin                   — protected by RequireRoleRoute (role: admin)
 ```
@@ -254,8 +284,9 @@ CI rules:
 
 Two authenticated roles exist:
 
-- `vendor` — a seller who owns a storefront. Authenticated via `public.users` + `user_login` RPC. Can manage their own products and profile (future).
-- `admin` — company-admin. Authenticated via `public.admins` + `admin_login` RPC. Can moderate reviews and manage vendor display names (future).
+- `vendor` — a store user. One or more users can administer the same storefront through `store_members`; owner and manager members share product-management permission.
+- `admin` — company-admin assigned to one emporium. The admin can create multiple stores, associate their users and moderate reviews.
+- Review moderation requires an authenticated `admin` session. Removed reviews remain in MongoDB for traceability and are excluded from public reads.
 
 Public (unauthenticated) access is allowed for:
 - Reading vendor storefronts (`get_vendor_list_with_products`, `get_vendor_profile`).
@@ -273,13 +304,13 @@ Treat these as approved goals. Implement one story at a time. No bundled feature
 
 | # | Story | Status |
 |---|-------|--------|
-| 1 | As a customer, I want to leave anonymous reviews. | Pending |
-| 2 | As a company, I want customers to contact sellers directly via links or phone. | Pending |
+| 1 | As a customer, I want to leave anonymous reviews. | **Done** |
+| 2 | As a company, I want customers to contact sellers directly via links or phone. | **Done** |
 | 3 | As a seller, I want to show my products in my own storefront. | **Done (public read)** |
-| 4 | As a company, I want to moderate and remove inappropriate reviews. | Pending |
-| 5 | As a seller, I want to manage my storefront after logging in. | Pending |
+| 4 | As a company, I want to moderate and remove inappropriate reviews. | **Done (admin moderation + logical removal)** |
+| 5 | As a seller, I want to manage my storefront after logging in. | **Done** |
 
-Story 3 is done for public read (home preview + full storefront page). The private management side (vendor CRUD for products) is part of Story 5.
+Story 3 includes public read (home preview + full storefront page). Story 5 provides private owner/manager product, profile, contact and review management.
 
 ## Execution rules for AI agents
 
@@ -294,3 +325,4 @@ Story 3 is done for public read (home preview + full storefront page). The priva
 9. If the task conflicts with this architecture, stop and ask Enzo or Fredy for confirmation before coding.
 10. For schema-breaking changes (new auth flows, folder restructures, API contract changes), request explicit approval from Enzo or Fredy first.
 11. After completing a task, verify: `npm run test` passes, coverage stays at or above 80%, and `npm run build` succeeds in both workspaces.
+12. Always include `public` in `REVOKE ... FROM anon, authenticated, public` for RPC functions. PostgreSQL grants EXECUTE to `public` by default, so revoking only from `anon, authenticated` is insufficient.

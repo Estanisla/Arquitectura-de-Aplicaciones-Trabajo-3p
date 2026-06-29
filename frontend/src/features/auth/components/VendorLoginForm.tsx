@@ -3,6 +3,7 @@ import type { FormEvent } from 'react'
 import { Link } from 'react-router-dom'
 import { loginVendor } from '../api/loginVendor'
 import type { VendorLoginResult } from '../types'
+import { DEFAULT_AUTH_ERROR_MESSAGE } from '../../../shared/errors/publicErrors'
 
 type FormStatus = 'idle' | 'loading' | 'error'
 
@@ -38,18 +39,16 @@ export function VendorLoginForm({
 
       if (!result.ok) {
         setStatus('error')
-        setFeedback(result.message)
+        setFeedback(DEFAULT_AUTH_ERROR_MESSAGE)
         return
       }
 
       await onSuccess(result)
       setStatus('idle')
       setFeedback('')
-    } catch (error) {
-      const message =
-        error instanceof Error ? error.message : 'Error inesperado en login'
+    } catch {
       setStatus('error')
-      setFeedback(message)
+      setFeedback(DEFAULT_AUTH_ERROR_MESSAGE)
     }
   }
 
@@ -93,9 +92,8 @@ export function VendorLoginForm({
       )}
 
       <p className="auth-secondary-link">
-        Acceso company-admin:{' '}
         <Link to="/auth/lg-admin" className="inline-link">
-          /auth/lg-admin
+          Acceso de administrador
         </Link>
       </p>
     </form>

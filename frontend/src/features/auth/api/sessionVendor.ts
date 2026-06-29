@@ -1,20 +1,14 @@
 import { env } from '../../../shared/config/env'
+import {
+  DEFAULT_ERROR_MESSAGE,
+  parseJsonResponse,
+} from '../../../shared/errors/publicErrors'
 import type { VendorSessionResult } from '../types'
 
 const parseSessionResponse = async (
   response: Response,
 ): Promise<VendorSessionResult> => {
-  const rawBody = await response.text()
-
-  if (!rawBody) {
-    throw new Error(`Session response without body (status ${response.status})`)
-  }
-
-  try {
-    return JSON.parse(rawBody) as VendorSessionResult
-  } catch {
-    throw new Error(`Session response invalid JSON (status ${response.status})`)
-  }
+  return parseJsonResponse<VendorSessionResult>(response)
 }
 
 export const getVendorSession = async (): Promise<VendorSessionResult> => {
@@ -26,7 +20,7 @@ export const getVendorSession = async (): Promise<VendorSessionResult> => {
   const result = await parseSessionResponse(response)
 
   if (!response.ok && response.status >= 500) {
-    throw new Error(result.message)
+    throw new Error(DEFAULT_ERROR_MESSAGE)
   }
 
   return result
@@ -41,7 +35,7 @@ export const logoutVendor = async (): Promise<VendorSessionResult> => {
   const result = await parseSessionResponse(response)
 
   if (!response.ok && response.status >= 500) {
-    throw new Error(result.message)
+    throw new Error(DEFAULT_ERROR_MESSAGE)
   }
 
   return result

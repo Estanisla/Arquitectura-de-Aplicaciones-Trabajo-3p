@@ -1,3 +1,4 @@
+import dns from "node:dns";
 import { MongoClient } from "mongodb";
 import { env } from "../config/env.js";
 
@@ -5,6 +6,9 @@ let client: MongoClient | null = null;
 
 export const getMongoClient = (): MongoClient => {
   if (!client) {
+    if (env.MONGODB_DNS_SERVERS.length > 0) {
+      dns.setServers(env.MONGODB_DNS_SERVERS);
+    }
     client = new MongoClient(env.MONGODB_URI);
   }
   return client;

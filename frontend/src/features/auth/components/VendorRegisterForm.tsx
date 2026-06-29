@@ -3,6 +3,7 @@ import type { FormEvent } from 'react'
 import { Link } from 'react-router-dom'
 import { registerVendor } from '../api/registerVendor'
 import type { VendorRegisterResult } from '../types'
+import { DEFAULT_ERROR_MESSAGE } from '../../../shared/errors/publicErrors'
 
 type FormStatus = 'idle' | 'loading' | 'error'
 
@@ -48,16 +49,14 @@ export function VendorRegisterForm({ onSuccess }: VendorRegisterFormProps) {
 
       if (!result.ok) {
         setStatus('error')
-        setFeedback(result.message)
+        setFeedback(DEFAULT_ERROR_MESSAGE)
         return
       }
 
       await onSuccess(result)
-    } catch (error) {
-      const message =
-        error instanceof Error ? error.message : 'Error inesperado en registro'
+    } catch {
       setStatus('error')
-      setFeedback(message)
+      setFeedback(DEFAULT_ERROR_MESSAGE)
     }
   }
 

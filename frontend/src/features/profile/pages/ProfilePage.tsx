@@ -2,7 +2,7 @@ import { Navigate } from 'react-router-dom'
 import { useAuthSession } from '../../auth/session/useAuthSession'
 
 export function ProfilePage() {
-  const { status, isAuthenticated, userId, logout } = useAuthSession()
+  const { status, isAuthenticated, role, logout } = useAuthSession()
 
   if (status === 'loading') {
     return (
@@ -21,14 +21,22 @@ export function ProfilePage() {
     await logout()
   }
 
+  const profile =
+    role === 'admin'
+      ? {
+          title: 'Perfil de administrador',
+          message: 'Sesion activa con permisos de administracion.',
+        }
+      : {
+          title: 'Perfil de vendedor',
+          message: 'Sesion activa como vendedor.',
+        }
+
   return (
     <section className="card-stack">
       <article className="card">
-        <h2>Perfil vendedor (placeholder)</h2>
-        <p>Sesion JWT activa para este usuario.</p>
-        <p>
-          <strong>user_id:</strong> {userId ?? 'no disponible'}
-        </p>
+        <h2>{profile.title}</h2>
+        <p>{profile.message}</p>
       </article>
       <article className="card">
         <button type="button" className="button-link button-link--secondary" onClick={handleLogout}>

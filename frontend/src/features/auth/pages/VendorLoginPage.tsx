@@ -28,7 +28,7 @@ export function VendorLoginPage() {
   const routeState = readRouteState(location.state)
 
   if (status !== 'loading' && isAuthenticated) {
-    return <Navigate to="/profile" replace />
+    return <Navigate to="/vendor" replace />
   }
 
   const handleSuccess = async (result: VendorLoginResult) => {
@@ -39,7 +39,7 @@ export function VendorLoginPage() {
       return
     }
 
-    navigate('/profile', { replace: true })
+    navigate('/vendor', { replace: true })
   }
 
   return (

@@ -1,10 +1,12 @@
 import type { ProductPreview } from '../vendor.types'
+import { ProductReviews } from '../../reviews/components/ProductReviews'
 
 type VendorProductGridProps = {
   products: ProductPreview[]
+  vendorId: string
 }
 
-export function VendorProductGrid({ products }: VendorProductGridProps) {
+export function VendorProductGrid({ products, vendorId }: VendorProductGridProps) {
   if (products.length === 0) {
     return <p>Esta tienda aun no tiene productos.</p>
   }
@@ -24,6 +26,7 @@ export function VendorProductGrid({ products }: VendorProductGridProps) {
           )}
           <h4>{product.name}</h4>
           {product.description && <p>{product.description}</p>}
+          <ProductReviews productId={product.id} vendorId={vendorId} />
         </div>
       ))}
     </div>

@@ -1,6 +1,5 @@
 import { Navigate, useNavigate } from 'react-router-dom'
 import { VendorRegisterForm } from '../components/VendorRegisterForm'
-import type { VendorRegisterResult } from '../types'
 import { useAuthSession } from '../session/useAuthSession'
 
 type LoginRouteState = {
@@ -15,9 +14,9 @@ export function VendorRegisterPage() {
     return <Navigate to="/profile" replace />
   }
 
-  const handleSuccess = async (result: VendorRegisterResult) => {
+  const handleSuccess = async () => {
     const routeState: LoginRouteState = {
-      registerMessage: result.message,
+      registerMessage: 'Cuenta creada correctamente. Inicia sesion.',
     }
 
     await refreshSession()

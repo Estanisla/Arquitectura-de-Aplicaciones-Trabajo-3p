@@ -2,6 +2,7 @@ import { useState } from 'react'
 import type { FormEvent } from 'react'
 import { changePassword } from '../api/changePassword'
 import type { ChangePasswordResult } from '../types'
+import { DEFAULT_ERROR_MESSAGE } from '../../../shared/errors/publicErrors'
 
 type FormStatus = 'idle' | 'loading' | 'error' | 'success'
 
@@ -39,18 +40,16 @@ export function ChangePasswordForm({ onSuccess }: ChangePasswordFormProps) {
 
       if (!result.ok) {
         setStatus('error')
-        setFeedback(result.message)
+        setFeedback(DEFAULT_ERROR_MESSAGE)
         return
       }
 
       await onSuccess(result)
       setStatus('success')
       setFeedback('Contrasena cambiada correctamente')
-    } catch (error) {
-      const message =
-        error instanceof Error ? error.message : 'Error inesperado'
+    } catch {
       setStatus('error')
-      setFeedback(message)
+      setFeedback(DEFAULT_ERROR_MESSAGE)
     }
   }
 

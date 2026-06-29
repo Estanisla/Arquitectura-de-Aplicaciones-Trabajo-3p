@@ -1,4 +1,4 @@
-import { supabase } from "../../lib/supabaseClient.js";
+import { supabase, supabaseAdmin } from "../../lib/supabaseClient.js";
 import type {
   AuthRequest,
   AuthResult,
@@ -57,7 +57,7 @@ export const authRepository = {
     currentPassword: string,
     newPassword: string,
   ): Promise<ChangePasswordResult> {
-    const { data, error } = await supabase.rpc("user_change_password", {
+    const { data, error } = await supabaseAdmin.rpc("user_change_password", {
       p_user_id: userId,
       p_current_password: currentPassword,
       p_new_password: newPassword,

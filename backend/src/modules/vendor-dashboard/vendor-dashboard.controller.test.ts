@@ -1,69 +1,100 @@
 import assert from "node:assert/strict";
 import test, { afterEach, mock } from "node:test";
+import type { Request, Response } from "express";
+import { AppError } from "../../shared/AppError.ts";
 
-process.env.SUPABASE_URL = process.env.SUPABASE_URL ?? "https://example.supabase.co";
-process.env.SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY ?? "anon-key";
-process.env.JWT_SECRET = process.env.JWT_SECRET ?? "test-secret";
+process.env.SUPABASE_URL ??= "https://example.supabase.co";
+process.env.SUPABASE_ANON_KEY ??= "anon-key";
+process.env.JWT_SECRET ??= "test-secret";
 
-const { vendorDashboardController } = await import("./vendor-dashboard.controller.ts");
 const { vendorDashboardService } = await import("./vendor-dashboard.service.ts");
+const { vendorDashboardController } = await import(
+  "./vendor-dashboard.controller.ts"
+);
 
-afterEach(() => {
+afterEach(() => mock.restoreAll());
+
+const userId = "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee";
+const storeId = "11111111-2222-3333-4444-555555555555";
+
+const response = () => {
+  const state = { status: 0, body: undefined as unknown };
+  const res = {
+    status(code: number) {
+      state.status = code;
+      return this;
+    },
+    json(body: unknown) {
+      state.body = body;
+      return this;
+    },
+  } as unknown as Response;
+  return { res, state };
+};
+
+const request = (params = {}, body = {}) => ({
+  vendorUserId: userId,
+  params,
+  body,
+}) as unknown as Request;
+
+test("listStores returns only managed store summaries", async () => {
+  mock.method(vendorDashboardService, "listManagedStores", async () => [{
+    store_id: storeId,
+    display_name: "Tienda",
+    member_role: "owner" as const,
+  }]);
+  const { res, state } = response();
+
+  await vendorDashboardController.listStores(request(), res);
+
+  assert.equal(state.status, 200);
+  assert.deepEqual(state.body, {
+    ok: true,
+    data: [{
+      store_id: storeId,
+      display_name: "Tienda",
+      member_role: "owner",
+    }],
+  });
+});
+
+test("createProduct returns 201 with the safe product id", async () => {
+  mock.method(vendorDashboardService, "createProduct", async () => storeId);
+  const { res, state } = response();
+
+  await vendorDashboardController.createProduct(
+    request({ storeId }, { name: "Producto" }),
+    res,
+  );
+
+  assert.equal(state.status, 201);
+  assert.deepEqual(state.body, {
+    ok: true,
+    message: "Producto creado",
+    productId: storeId,
+  });
+});
+
+test("controller replaces expected and unexpected errors", async () => {
+  mock.method(vendorDashboardService, "getStoreDashboard", async () => {
+    throw new AppError("detail", 404);
+  });
+  const first = response();
+  await vendorDashboardController.getStore(request({ storeId }), first.res);
+  assert.deepEqual(first.state.body, {
+    ok: false,
+    message: "Recurso no encontrado",
+  });
+
   mock.restoreAll();
-});
-
-const VALID_UUID = "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee";
-
-const mockProfile = {
-  vendor_id: VALID_UUID,
-  display_name: "Mi Tienda",
-  description: "Descripcion",
-  is_active: true,
-  products: [],
-};
-
-const mockRes = () => {
-  const res: Record<string, unknown> = {};
-  res.status = (code: number) => { res._status = code; return res; };
-  res.json = (data: unknown) => { res._json = data; return res; };
-  return res as unknown as import("express").Response;
-};
-
-test("getMyProfile returns 200 with vendor data", async () => {
-  mock.method(vendorDashboardService, "getMyProfile", async () => mockProfile);
-
-  const req = { vendorUserId: VALID_UUID } as unknown as import("express").Request;
-  const res = mockRes();
-
-  await vendorDashboardController.getMyProfile(req, res);
-
-  assert.equal((res as Record<string, unknown>)._status, 200);
-  assert.deepEqual((res as Record<string, unknown>)._json, { vendor: mockProfile });
-});
-
-test("getMyProfile returns 404 when AppError is thrown", async () => {
-  const { AppError } = await import("../../shared/AppError.ts");
-  mock.method(vendorDashboardService, "getMyProfile", async () => {
-    throw new AppError("Tienda no encontrada para este vendedor", 404);
+  mock.method(vendorDashboardService, "getStoreDashboard", async () => {
+    throw new Error("database endpoint");
   });
-
-  const req = { vendorUserId: VALID_UUID } as unknown as import("express").Request;
-  const res = mockRes();
-
-  await vendorDashboardController.getMyProfile(req, res);
-
-  assert.equal((res as Record<string, unknown>)._status, 404);
-});
-
-test("getMyProfile returns 500 on unexpected error", async () => {
-  mock.method(vendorDashboardService, "getMyProfile", async () => {
-    throw new Error("unexpected");
+  const second = response();
+  await vendorDashboardController.getStore(request({ storeId }), second.res);
+  assert.deepEqual(second.state.body, {
+    ok: false,
+    message: "No se pudo completar la solicitud",
   });
-
-  const req = { vendorUserId: VALID_UUID } as unknown as import("express").Request;
-  const res = mockRes();
-
-  await vendorDashboardController.getMyProfile(req, res);
-
-  assert.equal((res as Record<string, unknown>)._status, 500);
 });

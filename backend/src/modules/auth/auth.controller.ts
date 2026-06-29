@@ -18,9 +18,6 @@ type ChangePasswordBody = {
   newPassword?: string;
 };
 
-const getErrorMessage = (error: unknown, fallback: string) =>
-  error instanceof Error ? error.message : fallback;
-
 export const authController = {
   async login(req: Request<unknown, unknown, LoginBody>, res: Response) {
     try {
@@ -33,8 +30,8 @@ export const authController = {
       }
       setSessionCookie(res, result.user_id!, "vendor");
       return res.status(200).json(result);
-    } catch (error) {
-      return res.status(500).json({ ok: false, message: getErrorMessage(error, "Unknown login error") });
+    } catch {
+      return res.status(500).json({ ok: false, message: "No se pudo iniciar sesion" });
     }
   },
 
@@ -49,8 +46,8 @@ export const authController = {
       }
       setSessionCookie(res, result.admin_id!, "admin");
       return res.status(200).json(result);
-    } catch (error) {
-      return res.status(500).json({ ok: false, message: getErrorMessage(error, "Unknown admin login error") });
+    } catch {
+      return res.status(500).json({ ok: false, message: "No se pudo iniciar sesion" });
     }
   },
 
@@ -64,8 +61,8 @@ export const authController = {
         return res.status(400).json(result);
       }
       return res.status(201).json(result);
-    } catch (error) {
-      return res.status(500).json({ ok: false, message: getErrorMessage(error, "Unknown register error") });
+    } catch {
+      return res.status(500).json({ ok: false, message: "No se pudo completar el registro" });
     }
   },
 
@@ -119,7 +116,7 @@ export const authController = {
       if (error instanceof AppError) {
         return res.status(error.status).json({ ok: false, message: error.message });
       }
-      return res.status(500).json({ ok: false, message: getErrorMessage(error, "Error al cambiar contrasena") });
+      return res.status(500).json({ ok: false, message: "No se pudo cambiar la contrasena" });
     }
   },
 };

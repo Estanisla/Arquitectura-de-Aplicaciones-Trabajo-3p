@@ -1,7 +1,11 @@
-import { describe, it, expect, afterEach } from 'vitest'
+import { describe, it, expect, afterEach, vi } from 'vitest'
 import { render, screen, cleanup } from '@testing-library/react'
 import { VendorProductGrid } from './VendorProductGrid.tsx'
 import type { ProductPreview } from '../vendor.types'
+
+vi.mock('../../reviews/components/ProductReviews', () => ({
+  ProductReviews: () => <div>Resenas</div>,
+}))
 
 afterEach(() => {
   cleanup()
@@ -9,7 +13,7 @@ afterEach(() => {
 
 describe('VendorProductGrid', () => {
   it('shows empty message when no products', () => {
-    render(<VendorProductGrid products={[]} />)
+    render(<VendorProductGrid products={[]} vendorId="vendor-1" />)
     expect(
       screen.getByText('Esta tienda aun no tiene productos.'),
     ).toBeInTheDocument()
@@ -31,7 +35,7 @@ describe('VendorProductGrid', () => {
       },
     ]
 
-    render(<VendorProductGrid products={products} />)
+    render(<VendorProductGrid products={products} vendorId="vendor-1" />)
 
     const images = screen.getAllByRole('img')
     expect(images).toHaveLength(1)

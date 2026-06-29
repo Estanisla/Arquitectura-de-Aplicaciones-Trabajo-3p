@@ -1,27 +1,58 @@
-import { describe, it, expect, afterEach, vi } from 'vitest'
-import { render, screen, cleanup, waitFor } from '@testing-library/react'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { cleanup, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 
-const mockFetchVendors = vi.fn()
+const mockFetchManagedStores = vi.fn()
+const mockFetchReviews = vi.fn()
 
-vi.mock('../api/fetchVendors.ts', () => ({
-  fetchVendors: () => mockFetchVendors(),
+vi.mock('../api/fetchManagedStores.ts', () => ({
+  fetchManagedStores: () => mockFetchManagedStores(),
 }))
 
-vi.mock('../api/deactivateVendor.ts', () => ({
-  deactivateVendor: vi.fn(),
+vi.mock('../api/fetchReviews.ts', () => ({
+  fetchReviews: () => mockFetchReviews(),
 }))
 
-const activeVendor = {
-  user_id: 'u1',
-  username: 'vendor1',
-  display_name: 'Tienda 1',
-  vendor_id: 'v-1',
-  is_active: true,
-  is_deleted: false,
-  must_change_password: false,
-  created_at: '2025-01-01T00:00:00Z',
+vi.mock('../api/createManagedStore.ts', () => ({
+  createManagedStore: vi.fn(),
+}))
+
+vi.mock('../api/removeReview.ts', () => ({
+  removeReview: vi.fn(),
+}))
+
+const managedStores = {
+  emporium_name: 'Emporio Azul',
+  stores: [
+    {
+      store_id: 'store-1',
+      display_name: 'Tienda Central',
+      description: 'Local principal',
+      is_active: true,
+      created_at: '2026-06-28T00:00:00Z',
+      members: [
+        {
+          username: 'propietario',
+          role: 'owner',
+          is_active: true,
+          must_change_password: true,
+        },
+        {
+          username: 'encargado',
+          role: 'manager',
+          is_active: true,
+          must_change_password: true,
+        },
+      ],
+      contacts: [{ channel: 'whatsapp', value: '51999999999' }],
+    },
+  ],
 }
+
+beforeEach(() => {
+  mockFetchManagedStores.mockResolvedValue(managedStores)
+  mockFetchReviews.mockResolvedValue([])
+})
 
 afterEach(() => {
   cleanup()
@@ -29,221 +60,94 @@ afterEach(() => {
 })
 
 describe('AdminPanelPage', () => {
-  it('shows loading state initially', async () => {
-    mockFetchVendors.mockImplementation(
-      () =>
-        new Promise(() => {}),
-    )
-
+  it('shows the emporium, stores, members and contacts', async () => {
     const { AdminPanelPage } = await import('./AdminPanelPage.tsx')
-
     render(<AdminPanelPage />)
 
     expect(
-      screen.getByText('Cargando panel de administracion...'),
+      await screen.findByText('Emporio Azul: tiendas (1)'),
     ).toBeInTheDocument()
-  })
-
-  it('shows error state when fetch fails', async () => {
-    mockFetchVendors.mockRejectedValue(new Error('Error de red'))
-
-    const { AdminPanelPage } = await import('./AdminPanelPage.tsx')
-
-    render(<AdminPanelPage />)
-
+    expect(screen.getByText('Tienda Central')).toBeInTheDocument()
     expect(
-      await screen.findByText('Error de red'),
+      screen.getByText(/propietario \(Propietario\)/),
     ).toBeInTheDocument()
+    expect(screen.getByText(/encargado \(Administrador\)/)).toBeInTheDocument()
+    expect(screen.getByText(/whatsapp: 51999999999/)).toBeInTheDocument()
   })
 
-  it('shows fallback error message when fetch throws a non-Error', async () => {
-    mockFetchVendors.mockRejectedValue('string error')
-
-    const { AdminPanelPage } = await import('./AdminPanelPage.tsx')
-
-    render(<AdminPanelPage />)
-
-    expect(
-      await screen.findByText('Error al cargar vendedores'),
-    ).toBeInTheDocument()
-  })
-
-  it('shows vendor count when loaded', async () => {
-    mockFetchVendors.mockResolvedValue([
+  it('keeps review moderation available when store storage fails', async () => {
+    mockFetchManagedStores.mockRejectedValue(new Error('supabase unavailable'))
+    mockFetchReviews.mockResolvedValue([
       {
-        user_id: 'u1',
-        username: 'vendor1',
-        display_name: 'Tienda 1',
-        vendor_id: 'v-1',
-        is_active: true,
-        is_deleted: false,
-        must_change_password: false,
-        created_at: '2025-01-01T00:00:00Z',
+        id: 'review-demo',
+        product_id: 'product-demo',
+        vendor_id: 'vendor-demo',
+        product_name: 'Polo de demostracion',
+        store_name: 'Tienda de demostracion',
+        rating: 2,
+        comment: 'Resena disponible',
+        created_at: '2026-06-28T00:00:00Z',
+        status: 'visible',
+        moderated_at: null,
       },
     ])
 
     const { AdminPanelPage } = await import('./AdminPanelPage.tsx')
-
     render(<AdminPanelPage />)
 
-    await waitFor(() => {
-      expect(
-        screen.getByText(/Vendedores registrados/),
-      ).toBeInTheDocument()
-    })
-
-    expect(screen.getByText(/\(1\)/)).toBeInTheDocument()
-    expect(screen.getByText('vendor1')).toBeInTheDocument()
+    expect(
+      await screen.findByText('Gestion de tiendas no disponible'),
+    ).toBeInTheDocument()
+    expect(screen.getByText('Resena disponible')).toBeInTheDocument()
   })
 
-  it('shows empty vendors message', async () => {
-    mockFetchVendors.mockResolvedValue([])
-
-    const { AdminPanelPage } = await import('./AdminPanelPage.tsx')
-
-    render(<AdminPanelPage />)
-
-    await waitFor(() => {
-      expect(
-        screen.getByText('No hay vendedores registrados.'),
-      ).toBeInTheDocument()
-    })
-  })
-
-  describe('handleDeactivate', () => {
-    it('does nothing when confirm is cancelled', async () => {
-      mockFetchVendors.mockResolvedValue([activeVendor])
-      vi.spyOn(window, 'confirm').mockReturnValue(false)
-      const deactivateVendor = vi.mocked(
-        (await import('../api/deactivateVendor.ts')).deactivateVendor,
-      )
-
-      const { AdminPanelPage } = await import('./AdminPanelPage.tsx')
-      render(<AdminPanelPage />)
-
-      await waitFor(() => {
-        expect(screen.getByText('Desactivar')).toBeInTheDocument()
-      })
-
-      const user = userEvent.setup()
-      await user.click(screen.getByText('Desactivar'))
-
-      expect(deactivateVendor).not.toHaveBeenCalled()
-      vi.spyOn(window, 'confirm').mockRestore()
-    })
-
-    it('shows success feedback and reloads when deactivation succeeds', async () => {
-      mockFetchVendors.mockResolvedValue([activeVendor])
-      vi.spyOn(window, 'confirm').mockReturnValue(true)
-      const deactivateVendor = vi.mocked(
-        (await import('../api/deactivateVendor.ts')).deactivateVendor,
-      )
-      deactivateVendor.mockResolvedValue({ ok: true, message: 'Tienda desactivada' })
-
-      const { AdminPanelPage } = await import('./AdminPanelPage.tsx')
-      render(<AdminPanelPage />)
-
-      await waitFor(() => {
-        expect(screen.getByText('Desactivar')).toBeInTheDocument()
-      })
-
-      const user = userEvent.setup()
-      await user.click(screen.getByText('Desactivar'))
-
-      await waitFor(() => {
-        expect(
-          screen.getByText('Tienda desactivada correctamente'),
-        ).toBeInTheDocument()
-      })
-
-      expect(mockFetchVendors).toHaveBeenCalled()
-    })
-
-    it('shows error feedback when API returns ok false', async () => {
-      mockFetchVendors.mockResolvedValue([activeVendor])
-      vi.spyOn(window, 'confirm').mockReturnValue(true)
-      const deactivateVendor = vi.mocked(
-        (await import('../api/deactivateVendor.ts')).deactivateVendor,
-      )
-      deactivateVendor.mockResolvedValue({ ok: false, message: 'Error al desactivar' })
-
-      const { AdminPanelPage } = await import('./AdminPanelPage.tsx')
-      render(<AdminPanelPage />)
-
-      await waitFor(() => {
-        expect(screen.getByText('Desactivar')).toBeInTheDocument()
-      })
-
-      const user = userEvent.setup()
-      await user.click(screen.getByText('Desactivar'))
-
-      await waitFor(() => {
-        expect(screen.getByText('Error al desactivar')).toBeInTheDocument()
-      })
-    })
-
-    it('shows error feedback when deactivate API throws', async () => {
-      mockFetchVendors.mockResolvedValue([activeVendor])
-      vi.spyOn(window, 'confirm').mockReturnValue(true)
-      const deactivateVendor = vi.mocked(
-        (await import('../api/deactivateVendor.ts')).deactivateVendor,
-      )
-      deactivateVendor.mockRejectedValue(new Error('Error de red'))
-
-      const { AdminPanelPage } = await import('./AdminPanelPage.tsx')
-      render(<AdminPanelPage />)
-
-      await waitFor(() => {
-        expect(screen.getByText('Desactivar')).toBeInTheDocument()
-      })
-
-      const user = userEvent.setup()
-      await user.click(screen.getByText('Desactivar'))
-
-      await waitFor(() => {
-        expect(screen.getByText('Error de red')).toBeInTheDocument()
-      })
-    })
-
-    it('shows fallback error when deactivate throws a non-Error', async () => {
-      mockFetchVendors.mockResolvedValue([activeVendor])
-      vi.spyOn(window, 'confirm').mockReturnValue(true)
-      const deactivateVendor = vi.mocked(
-        (await import('../api/deactivateVendor.ts')).deactivateVendor,
-      )
-      deactivateVendor.mockRejectedValue('string error')
-
-      const { AdminPanelPage } = await import('./AdminPanelPage.tsx')
-      render(<AdminPanelPage />)
-
-      await waitFor(() => {
-        expect(screen.getByText('Desactivar')).toBeInTheDocument()
-      })
-
-      const user = userEvent.setup()
-      await user.click(screen.getByText('Desactivar'))
-
-      await waitFor(() => {
-        expect(screen.getByText('Error al desactivar')).toBeInTheDocument()
-      })
-    })
-  })
-
-  it('handles unmount before fetch completes to cover cleanup', async () => {
-    // Retrasamos la respuesta para asegurar que el desmontaje ocurra antes
-    mockFetchVendors.mockImplementation(
-      () => new Promise((resolve) => setTimeout(() => resolve([]), 50)),
+  it('removes a review after confirmation', async () => {
+    mockFetchReviews.mockResolvedValue([
+      {
+        id: 'review-1',
+        product_id: 'product-1',
+        vendor_id: 'vendor-1',
+        product_name: 'Polo azul',
+        store_name: 'Tienda Central',
+        rating: 1,
+        comment: 'Contenido inapropiado',
+        created_at: '2026-06-28T00:00:00Z',
+        status: 'visible',
+        moderated_at: null,
+      },
+    ])
+    vi.spyOn(window, 'confirm').mockReturnValue(true)
+    const removeReview = vi.mocked(
+      (await import('../api/removeReview.ts')).removeReview,
     )
+    removeReview.mockResolvedValue()
 
     const { AdminPanelPage } = await import('./AdminPanelPage.tsx')
+    render(<AdminPanelPage />)
+    const user = userEvent.setup()
+    await user.click(await screen.findByRole('button', { name: 'Eliminar' }))
 
-    // Extraemos unmount para destruir el componente bajo demanda
-    const { unmount } = render(<AdminPanelPage />)
+    await waitFor(() => {
+      expect(removeReview).toHaveBeenCalledWith('review-1')
+    })
+    expect(
+      screen.getByText('Resena eliminada correctamente'),
+    ).toBeInTheDocument()
+  })
 
-    // Forzamos el desmontaje inmediato (ejecuta el return del useEffect)
-    unmount()
+  it('retries store loading after an error', async () => {
+    mockFetchManagedStores
+      .mockRejectedValueOnce(new Error('temporary'))
+      .mockResolvedValueOnce(managedStores)
 
-    // Avanzamos el reloj/tiempo para que la promesa se resuelva en el limbo
-    await new Promise((resolve) => setTimeout(resolve, 60))
+    const { AdminPanelPage } = await import('./AdminPanelPage.tsx')
+    render(<AdminPanelPage />)
+    const user = userEvent.setup()
+
+    await user.click(await screen.findByRole('button', { name: 'Reintentar' }))
+
+    expect(
+      await screen.findByText('Emporio Azul: tiendas (1)'),
+    ).toBeInTheDocument()
   })
 })

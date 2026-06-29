@@ -1,4 +1,5 @@
 import { env } from '../../../shared/config/env'
+import { DEFAULT_AUTH_ERROR_MESSAGE } from '../../../shared/errors/publicErrors'
 import type { VendorLoginRequest, VendorLoginResult } from '../types'
 import { parseAuthResponse } from './parseAuthResponse'
 
@@ -16,8 +17,8 @@ export const loginVendor = async (
 
   const result = (await parseAuthResponse(response, 'Login')) as VendorLoginResult
 
-  if (!response.ok && response.status >= 500) {
-    throw new Error(result.message)
+  if (!response.ok || !result.ok) {
+    throw new Error(DEFAULT_AUTH_ERROR_MESSAGE)
   }
 
   return result

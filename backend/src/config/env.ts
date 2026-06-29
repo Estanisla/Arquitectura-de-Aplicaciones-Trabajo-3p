@@ -30,14 +30,23 @@ const readBooleanEnv = (name: string, fallback: boolean): boolean => {
 };
 
 export const env = {
+  NODE_ENV: readStringEnv("NODE_ENV", "development"),
   PORT: Number(process.env.PORT ?? 3001),
-  FRONTEND_ORIGIN: readStringEnv("FRONTEND_ORIGIN", "http://localhost:5173"),
+  FRONTEND_ORIGIN: readStringEnv("FRONTEND_ORIGIN", "http://127.0.0.1:5173"),
   SUPABASE_URL: requireEnv("SUPABASE_URL"),
   SUPABASE_ANON_KEY: requireEnv("SUPABASE_ANON_KEY"),
+  SUPABASE_SERVICE_ROLE_KEY: readStringEnv(
+    "SUPABASE_SERVICE_ROLE_KEY",
+    requireEnv("SUPABASE_ANON_KEY"),
+  ),
   JWT_SECRET: requireEnv("JWT_SECRET"),
   JWT_EXPIRES_IN: readStringEnv("JWT_EXPIRES_IN", "12h"),
   SESSION_COOKIE_NAME: readStringEnv("SESSION_COOKIE_NAME", "vendor_session"),
   COOKIE_SECURE: readBooleanEnv("COOKIE_SECURE", false),
-  MONGODB_URI: readStringEnv("MONGODB_URI", "mongodb://localhost:27017"),
-  MONGODB_DB_NAME: readStringEnv("MONGODB_DB_NAME", "estanisrate"),
+  MONGODB_URI: requireEnv("MONGODB_URI"),
+  MONGODB_DB_NAME: requireEnv("MONGODB_DB_NAME"),
+  MONGODB_DNS_SERVERS: readStringEnv("MONGODB_DNS_SERVERS", "")
+    .split(",")
+    .map((server) => server.trim())
+    .filter(Boolean),
 };

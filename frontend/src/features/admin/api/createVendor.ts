@@ -1,4 +1,8 @@
 import { env } from '../../../shared/config/env'
+import {
+  DEFAULT_ERROR_MESSAGE,
+  parseJsonResponse,
+} from '../../../shared/errors/publicErrors'
 
 export type CreateVendorPayload = {
   username: string
@@ -24,11 +28,15 @@ export const createVendor = async (
     body: JSON.stringify(payload),
   })
 
-  const result: CreateVendorResult = await response.json()
+  const result = await parseJsonResponse<CreateVendorResult>(response)
 
-  if (!response.ok && response.status >= 500) {
-    throw new Error(result.message)
+  if (!response.ok) {
+    throw new Error(DEFAULT_ERROR_MESSAGE)
   }
 
-  return result
+  return {
+    ...result,
+    ok: true,
+    message: 'Vendedor creado correctamente',
+  }
 }

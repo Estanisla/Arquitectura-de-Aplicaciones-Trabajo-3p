@@ -1,4 +1,8 @@
 import { env } from '../../../shared/config/env'
+import {
+  DEFAULT_ERROR_MESSAGE,
+  parseJsonResponse,
+} from '../../../shared/errors/publicErrors'
 
 export type DeactivateVendorResult = {
   ok: boolean
@@ -16,10 +20,10 @@ export const deactivateVendor = async (
     },
   )
 
-  const result: DeactivateVendorResult = await response.json()
+  const result = await parseJsonResponse<DeactivateVendorResult>(response)
 
-  if (!response.ok && response.status >= 500) {
-    throw new Error(result.message)
+  if (!response.ok || !result.ok) {
+    throw new Error(DEFAULT_ERROR_MESSAGE)
   }
 
   return result

@@ -1,4 +1,8 @@
 import { env } from '../../../shared/config/env'
+import {
+  DEFAULT_LOAD_ERROR_MESSAGE,
+  parseJsonResponse,
+} from '../../../shared/errors/publicErrors'
 
 export type AdminVendorItem = {
   user_id: string
@@ -23,10 +27,10 @@ export const fetchVendors = async (): Promise<AdminVendorItem[]> => {
     credentials: 'include',
   })
 
-  const result: FetchVendorsResult = await response.json()
+  const result = await parseJsonResponse<FetchVendorsResult>(response)
 
   if (!response.ok) {
-    throw new Error(result.message ?? 'Error al obtener vendedores')
+    throw new Error(DEFAULT_LOAD_ERROR_MESSAGE)
   }
 
   return result.vendors ?? []
