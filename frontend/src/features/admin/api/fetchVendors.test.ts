@@ -62,7 +62,9 @@ describe('fetchVendors', () => {
       ),
     )
 
-    await expect(fetchVendors()).rejects.toThrow('No autorizado')
+    await expect(fetchVendors()).rejects.toThrow(
+      'No se pudo cargar la informacion. Intenta nuevamente.',
+    )
   })
 
   it('uses fallback message when result.message is missing', async () => {
@@ -77,7 +79,7 @@ describe('fetchVendors', () => {
     )
 
     await expect(fetchVendors()).rejects.toThrow(
-      'Error al obtener vendedores',
+      'No se pudo cargar la informacion. Intenta nuevamente.',
     )
   })
 

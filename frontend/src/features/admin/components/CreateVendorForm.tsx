@@ -2,6 +2,7 @@ import { useState } from 'react'
 import type { FormEvent } from 'react'
 import { createVendor } from '../api/createVendor'
 import type { CreateVendorPayload } from '../api/createVendor'
+import { DEFAULT_ERROR_MESSAGE } from '../../../shared/errors/publicErrors'
 
 type FormStatus = 'idle' | 'loading' | 'error' | 'success'
 
@@ -54,7 +55,7 @@ export function CreateVendorForm({ onCreated }: CreateVendorFormProps) {
 
       if (!result.ok) {
         setStatus('error')
-        setFeedback(result.message)
+        setFeedback(DEFAULT_ERROR_MESSAGE)
         return
       }
 
@@ -66,11 +67,9 @@ export function CreateVendorForm({ onCreated }: CreateVendorFormProps) {
       if (result.userId && result.vendorId) {
         onCreated()
       }
-    } catch (error) {
-      const message =
-        error instanceof Error ? error.message : 'Error inesperado'
+    } catch {
       setStatus('error')
-      setFeedback(message)
+      setFeedback(DEFAULT_ERROR_MESSAGE)
     }
   }
 

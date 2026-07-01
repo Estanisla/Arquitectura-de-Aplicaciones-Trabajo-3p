@@ -42,7 +42,7 @@ describe('createVendor', () => {
     expect(callBody.description).toBe('Desc')
   })
 
-  it('returns ok false on 409', async () => {
+  it('uses a generic error on 409', async () => {
     vi.stubGlobal(
       'fetch',
       buildFetchMock(409, {
@@ -51,14 +51,13 @@ describe('createVendor', () => {
       }),
     )
 
-    const result = await createVendor({
-      username: 'exists',
-      tempPassword: 'temp123',
-      displayName: 'Test',
-    })
-
-    expect(result.ok).toBe(false)
-    expect(result.message).toBe('El username ya existe')
+    await expect(
+      createVendor({
+        username: 'exists',
+        tempPassword: 'temp123',
+        displayName: 'Test',
+      }),
+    ).rejects.toThrow('No se pudo completar la solicitud. Intenta nuevamente.')
   })
 
   it('throws on 500', async () => {
@@ -73,6 +72,6 @@ describe('createVendor', () => {
         tempPassword: 'temp123',
         displayName: 'Test',
       }),
-    ).rejects.toThrow('Error')
+    ).rejects.toThrow('No se pudo completar la solicitud. Intenta nuevamente.')
   })
 })

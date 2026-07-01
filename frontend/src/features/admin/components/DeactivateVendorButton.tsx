@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { deactivateVendor } from '../api/deactivateVendor'
+import { DEFAULT_ERROR_MESSAGE } from '../../../shared/errors/publicErrors'
 
 type DeactivateVendorButtonProps = {
   vendorId: string
@@ -30,16 +31,14 @@ export function DeactivateVendorButton({
 
       if (!result.ok) {
         setStatus('error')
-        setFeedback(result.message)
+        setFeedback(DEFAULT_ERROR_MESSAGE)
         return
       }
 
       onDeactivated()
-    } catch (error) {
-      const message =
-        error instanceof Error ? error.message : 'Error inesperado'
+    } catch {
       setStatus('error')
-      setFeedback(message)
+      setFeedback(DEFAULT_ERROR_MESSAGE)
     }
   }
 

@@ -1,4 +1,4 @@
-import { supabase } from "../../lib/supabaseClient.js";
+import { supabaseAdmin } from "../../lib/supabaseClient.js";
 import type { CreateVendorInput, VendorRow } from "./admin-panel.types.js";
 
 type RpcResult = {
@@ -19,7 +19,7 @@ export const adminPanelRepository = {
     adminId: string,
     input: CreateVendorInput,
   ): Promise<RpcResult> {
-    const { data, error } = await supabase.rpc("admin_create_vendor", {
+    const { data, error } = await supabaseAdmin.rpc("admin_create_vendor", {
       p_admin_id: adminId,
       p_username: input.username,
       p_temp_password: input.tempPassword,
@@ -35,7 +35,7 @@ export const adminPanelRepository = {
   },
 
   async listVendors(adminId: string): Promise<VendorRow[]> {
-    const { data, error } = await supabase.rpc("admin_list_vendors", {
+    const { data, error } = await supabaseAdmin.rpc("admin_list_vendors", {
       p_admin_id: adminId,
     });
 
@@ -56,7 +56,7 @@ export const adminPanelRepository = {
     adminId: string,
     vendorId: string,
   ): Promise<RpcResult> {
-    const { data, error } = await supabase.rpc("admin_deactivate_vendor", {
+    const { data, error } = await supabaseAdmin.rpc("admin_deactivate_vendor", {
       p_admin_id: adminId,
       p_vendor_id: vendorId,
     });

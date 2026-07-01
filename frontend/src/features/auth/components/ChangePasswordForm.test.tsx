@@ -100,7 +100,9 @@ describe('ChangePasswordForm', () => {
     )
 
     expect(
-      await screen.findByText('Contrasena actual incorrecta'),
+      await screen.findByText(
+        'No se pudo completar la solicitud. Intenta nuevamente.',
+      ),
     ).toBeInTheDocument()
   })
 
@@ -124,7 +126,9 @@ describe('ChangePasswordForm', () => {
     )
 
     expect(
-      await screen.findByText('Error de red'),
+      await screen.findByText(
+        'No se pudo completar la solicitud. Intenta nuevamente.',
+      ),
     ).toBeInTheDocument()
   })
 
@@ -148,7 +152,9 @@ describe('ChangePasswordForm', () => {
     )
 
     expect(
-      await screen.findByText('Error inesperado'),
+      await screen.findByText(
+        'No se pudo completar la solicitud. Intenta nuevamente.',
+      ),
     ).toBeInTheDocument()
   })
 

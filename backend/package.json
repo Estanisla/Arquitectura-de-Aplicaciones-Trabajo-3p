@@ -9,7 +9,8 @@
     "build": "tsc -p tsconfig.json",
     "start": "node dist/server.js",
     "typecheck": "tsc --noEmit",
-    "test": "node --import tsx --test src/modules/auth/*.test.ts src/modules/vendors/*.test.ts src/modules/admin-panel/*.test.ts",
+    "test": "node --import tsx --test src/modules/auth/*.test.ts src/modules/vendors/*.test.ts src/modules/admin-panel/*.test.ts src/modules/vendor-dashboard/*.test.ts src/modules/reviews/*.test.ts src/modules/store-management/*.test.ts",
+    "test:reviews:coverage": "node --import tsx --test --experimental-test-coverage --test-coverage-lines=85 --test-coverage-functions=85 --test-coverage-branches=85 --test-coverage-include=src/modules/reviews/*.ts --test-coverage-exclude=src/modules/reviews/*.test.ts --test-coverage-exclude=src/modules/reviews/reviews.routes.ts --test-coverage-exclude=src/modules/reviews/reviews.types.ts src/modules/reviews/*.test.ts",
     "test:coverage": "node --import tsx --test --experimental-test-coverage --test-coverage-lines=80 --test-coverage-functions=80 --test-coverage-branches=80 --test-coverage-include=src/modules/auth/*.ts --test-coverage-exclude=src/modules/auth/*.test.ts --test-coverage-exclude=src/modules/auth/auth.routes.ts --test-coverage-exclude=src/modules/auth/auth.types.ts src/modules/auth/*.test.ts"
   },
   "keywords": [

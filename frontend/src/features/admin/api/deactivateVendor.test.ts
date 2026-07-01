@@ -24,7 +24,7 @@ describe('deactivateVendor', () => {
     expect(fetchMock.mock.calls[0]?.[1]?.method).toBe('PATCH')
   })
 
-  it('returns ok false on 404', async () => {
+  it('uses a generic error on 404', async () => {
     vi.stubGlobal(
       'fetch',
       vi.fn().mockResolvedValue(
@@ -35,9 +35,9 @@ describe('deactivateVendor', () => {
       ),
     )
 
-    const result = await deactivateVendor('bad-id')
-    expect(result.ok).toBe(false)
-    expect(result.message).toBe('Vendedor no encontrado')
+    await expect(deactivateVendor('bad-id')).rejects.toThrow(
+      'No se pudo completar la solicitud. Intenta nuevamente.',
+    )
   })
 
   it('throws on 500', async () => {
@@ -52,7 +52,7 @@ describe('deactivateVendor', () => {
     )
 
     await expect(deactivateVendor('bad-id')).rejects.toThrow(
-      'Error del servidor',
+      'No se pudo completar la solicitud. Intenta nuevamente.',
     )
   })
 })

@@ -6,7 +6,7 @@ process.env.SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY ?? "anon-key";
 process.env.JWT_SECRET = process.env.JWT_SECRET ?? "test-secret";
 
 const { authRepository } = await import("./auth.repository.ts");
-const { supabase } = await import("../../lib/supabaseClient.ts");
+const { supabase, supabaseAdmin } = await import("../../lib/supabaseClient.ts");
 
 afterEach(() => {
   mock.restoreAll();
@@ -119,7 +119,7 @@ test("authRepository.loginWithRpcV2 returns must_change_password false for norma
 });
 
 test("authRepository.changePasswordWithRpc calls user_change_password with correct params", async () => {
-  const rpcMock = mock.method(supabase, "rpc", async () => ({
+  const rpcMock = mock.method(supabaseAdmin, "rpc", async () => ({
     data: {
       ok: true,
       message: "Contrasena actualizada correctamente",
@@ -144,7 +144,7 @@ test("authRepository.changePasswordWithRpc calls user_change_password with corre
 });
 
 test("authRepository.changePasswordWithRpc returns ok false when RPC fails", async () => {
-  mock.method(supabase, "rpc", async () => ({
+  mock.method(supabaseAdmin, "rpc", async () => ({
     data: {
       ok: false,
       message: "Contrasena actual incorrecta",

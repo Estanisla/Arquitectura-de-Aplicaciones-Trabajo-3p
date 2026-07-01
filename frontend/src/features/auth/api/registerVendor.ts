@@ -1,4 +1,5 @@
 import { env } from '../../../shared/config/env'
+import { DEFAULT_ERROR_MESSAGE } from '../../../shared/errors/publicErrors'
 import type { VendorRegisterRequest, VendorRegisterResult } from '../types'
 import { parseAuthResponse } from './parseAuthResponse'
 
@@ -19,8 +20,8 @@ export const registerVendor = async (
     'Register',
   )) as VendorRegisterResult
 
-  if (!response.ok && response.status >= 500) {
-    throw new Error(result.message)
+  if (!response.ok || !result.ok) {
+    throw new Error(DEFAULT_ERROR_MESSAGE)
   }
 
   return result

@@ -34,7 +34,7 @@ describe('changePassword', () => {
     })
   })
 
-  it('returns ok false on 400', async () => {
+  it('uses a generic error on 400', async () => {
     vi.stubGlobal(
       'fetch',
       buildFetchMock(400, {
@@ -43,13 +43,12 @@ describe('changePassword', () => {
       }),
     )
 
-    const result = await changePassword({
-      currentPassword: 'same',
-      newPassword: 'same',
-    })
-
-    expect(result.ok).toBe(false)
-    expect(result.message).toBe('La nueva contrasena debe ser diferente')
+    await expect(
+      changePassword({
+        currentPassword: 'same',
+        newPassword: 'same',
+      }),
+    ).rejects.toThrow('No se pudo completar la solicitud. Intenta nuevamente.')
   })
 
   it('throws on 500', async () => {
@@ -63,6 +62,6 @@ describe('changePassword', () => {
 
     await expect(
       changePassword({ currentPassword: 'a', newPassword: 'b' }),
-    ).rejects.toThrow('Error interno')
+    ).rejects.toThrow('No se pudo completar la solicitud. Intenta nuevamente.')
   })
 })

@@ -54,7 +54,7 @@ begin
 end;
 $$;
 
-revoke all on function public.get_my_vendor_profile(uuid) from anon, authenticated;
+revoke all on function public.get_my_vendor_profile(uuid) from anon, authenticated, public;
 grant execute on function public.get_my_vendor_profile(uuid) to authenticated;
 
 -- vendor_update_profile(vendor_id, display_name, description)
@@ -98,5 +98,5 @@ begin
 end;
 $$;
 
-revoke all on function public.vendor_update_profile(uuid, text, text) from anon, authenticated;
+revoke all on function public.vendor_update_profile(uuid, text, text) from anon, authenticated, public;
 grant execute on function public.vendor_update_profile(uuid, text, text) to authenticated;

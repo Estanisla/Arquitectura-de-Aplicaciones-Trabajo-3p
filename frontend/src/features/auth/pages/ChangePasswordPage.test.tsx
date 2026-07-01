@@ -85,7 +85,7 @@ describe('ChangePasswordPage', () => {
 
     await waitFor(() => {
       expect(mockRefreshSession).toHaveBeenCalledOnce()
-      expect(mockNavigate).toHaveBeenCalledWith('/profile', {
+      expect(mockNavigate).toHaveBeenCalledWith('/vendor', {
         replace: true,
       })
     })

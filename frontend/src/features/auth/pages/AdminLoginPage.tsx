@@ -1,9 +1,9 @@
 import { useState } from 'react'
 import type { FormEvent } from 'react'
-import { Link } from 'react-router-dom'
-import { useNavigate } from 'react-router-dom'
+import { Link, Navigate } from 'react-router-dom'
 import { loginAdmin } from '../api/loginAdmin'
 import { useAuthSession } from '../session/useAuthSession'
+import { DEFAULT_AUTH_ERROR_MESSAGE } from '../../../shared/errors/publicErrors'
 
 const initialCredentials = {
   username: '',
@@ -13,8 +13,16 @@ const initialCredentials = {
 export function AdminLoginPage() {
   const [credentials, setCredentials] = useState(initialCredentials)
   const [feedback, setFeedback] = useState('')
-  const navigate = useNavigate()
-  const { refreshSession } = useAuthSession()
+  const {
+    refreshSession,
+    status,
+    isAuthenticated,
+    role,
+  } = useAuthSession()
+
+  if (status !== 'loading' && isAuthenticated && role === 'admin') {
+    return <Navigate to="/admin" replace />
+  }
 
   const updateField = (field: 'username' | 'password', value: string) => {
     setCredentials((prev) => ({ ...prev, [field]: value }))
@@ -28,15 +36,13 @@ export function AdminLoginPage() {
       const result = await loginAdmin(credentials)
 
       if (!result.ok) {
-        setFeedback(result.message)
+        setFeedback(DEFAULT_AUTH_ERROR_MESSAGE)
         return
       }
 
       await refreshSession()
-      navigate('/admin', { replace: true })
-    } catch (error) {
-      const message = error instanceof Error ? error.message : 'Error de login'
-      setFeedback(message)
+    } catch {
+      setFeedback(DEFAULT_AUTH_ERROR_MESSAGE)
     }
   }
 
@@ -80,9 +86,8 @@ export function AdminLoginPage() {
       {feedback && <p className="feedback">{feedback}</p>}
 
       <p className="auth-secondary-link">
-        Volver al acceso vendedor:{' '}
         <Link to="/auth/login" className="inline-link">
-          /auth/login
+          Volver al acceso de vendedor
         </Link>
       </p>
     </form>

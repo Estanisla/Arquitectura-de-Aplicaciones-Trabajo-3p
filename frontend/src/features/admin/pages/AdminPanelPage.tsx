@@ -1,102 +1,145 @@
 import { useCallback, useEffect, useState } from 'react'
-import { fetchVendors } from '../api/fetchVendors'
-import type { AdminVendorItem } from '../api/fetchVendors'
-import { VendorTable } from '../components/VendorTable'
-import { CreateVendorForm } from '../components/CreateVendorForm'
-import { deactivateVendor } from '../api/deactivateVendor'
+import { fetchReviews } from '../api/fetchReviews'
+import { removeReview } from '../api/removeReview'
+import { ReviewModerationTable } from '../components/ReviewModerationTable'
+import type { AdminReviewItem } from '../reviewModeration.types'
+import { fetchManagedStores } from '../api/fetchManagedStores'
+import type { ManagedStoreCollection } from '../storeManagement.types'
+import { CreateManagedStoreForm } from '../components/CreateManagedStoreForm'
+import { ManagedStoreTable } from '../components/ManagedStoreTable'
+import {
+  DEFAULT_ERROR_MESSAGE,
+  DEFAULT_LOAD_ERROR_MESSAGE,
+} from '../../../shared/errors/publicErrors'
 
 type PageStatus = 'loading' | 'ready' | 'error'
+type ReviewStatus = 'loading' | 'ready' | 'error'
+type ActionFeedback = {
+  type: 'success' | 'error'
+  message: string
+} | null
 
 export function AdminPanelPage() {
-  const [vendors, setVendors] = useState<AdminVendorItem[]>([])
+  const [managedStores, setManagedStores] = useState<ManagedStoreCollection>({
+    emporium_name: null,
+    stores: [],
+  })
   const [status, setStatus] = useState<PageStatus>('loading')
   const [errorMessage, setErrorMessage] = useState('')
-  const [actionFeedback, setActionFeedback] = useState('')
+  const [reviews, setReviews] = useState<AdminReviewItem[]>([])
+  const [reviewStatus, setReviewStatus] = useState<ReviewStatus>('loading')
+  const [reviewFeedback, setReviewFeedback] = useState<ActionFeedback>(null)
 
-  const loadVendors = useCallback(async () => {
+  const loadStores = useCallback(async () => {
     try {
-      const data = await fetchVendors()
-      setVendors(data)
+      const data = await fetchManagedStores()
+      setManagedStores(data)
       setStatus('ready')
-    } catch (error) {
-      const message =
-        error instanceof Error ? error.message : 'Error al cargar vendedores'
-      setErrorMessage(message)
+    } catch {
+      setErrorMessage(DEFAULT_LOAD_ERROR_MESSAGE)
       setStatus('error')
+    }
+  }, [])
+
+  const loadReviews = useCallback(async () => {
+    try {
+      const data = await fetchReviews()
+      setReviews(data)
+      setReviewStatus('ready')
+    } catch {
+      setReviewFeedback({
+        type: 'error',
+        message: DEFAULT_LOAD_ERROR_MESSAGE,
+      })
+      setReviewStatus('error')
     }
   }, [])
 
   useEffect(() => {
     const init = async () => {
-      await loadVendors()
+      await Promise.all([loadStores(), loadReviews()])
     }
     void init()
-  }, [loadVendors])
+  }, [loadReviews, loadStores])
 
-  const handleDeactivate = async (vendorId: string) => {
-    const vendor = vendors.find((v) => v.vendor_id === vendorId)
-    if (!vendor) return
-
+  const handleRemoveReview = async (reviewId: string) => {
     const confirmed = window.confirm(
-      `Desactivar la tienda "${vendor.display_name}"?`,
+      'Eliminar esta resena? Dejaremos de mostrarla publicamente.',
     )
     if (!confirmed) return
 
     try {
-      setActionFeedback('')
-      const result = await deactivateVendor(vendorId)
-      if (!result.ok) {
-        setActionFeedback(result.message)
-        return
-      }
-      setActionFeedback('Tienda desactivada correctamente')
-      await loadVendors()
-    } catch (error) {
-      const message =
-        error instanceof Error ? error.message : 'Error al desactivar'
-      setActionFeedback(message)
+      setReviewFeedback(null)
+      await removeReview(reviewId)
+      setReviewFeedback({
+        type: 'success',
+        message: 'Resena eliminada correctamente',
+      })
+      await loadReviews()
+    } catch {
+      setReviewFeedback({ type: 'error', message: DEFAULT_ERROR_MESSAGE })
     }
-  }
-
-  if (status === 'loading') {
-    return (
-      <section className="card-stack">
-        <article className="card">
-          <p>Cargando panel de administracion...</p>
-        </article>
-      </section>
-    )
-  }
-
-  if (status === 'error') {
-    return (
-      <section className="card-stack">
-        <article className="card">
-          <h2>Error</h2>
-          <p className="feedback feedback--error">{errorMessage}</p>
-          <button className="button-link" onClick={loadVendors}>
-            Reintentar
-          </button>
-        </article>
-      </section>
-    )
   }
 
   return (
     <section className="card-stack">
       <article className="card">
         <h2>Panel company-admin</h2>
-        <p>Gestion de vendedores y tiendas.</p>
+        <p>Gestion del emporio, tiendas, usuarios y moderacion.</p>
       </article>
+      {status === 'loading' && (
+        <article className="card">
+          <p>Cargando panel de administracion...</p>
+        </article>
+      )}
+      {status === 'error' && (
+        <article className="card">
+          <h3>Gestion de tiendas no disponible</h3>
+          <p className="feedback feedback--error">{errorMessage}</p>
+          <button type="button" className="button-link" onClick={loadStores}>
+            Reintentar
+          </button>
+        </article>
+      )}
+      {status === 'ready' && (
+        <>
+          <article className="card">
+            <CreateManagedStoreForm
+              currentEmporiumName={managedStores.emporium_name}
+              onCreated={loadStores}
+            />
+          </article>
+          <article className="card">
+            <h3>
+              {managedStores.emporium_name ?? 'Emporio sin configurar'}: tiendas
+              ({managedStores.stores.length})
+            </h3>
+            <ManagedStoreTable
+              stores={managedStores.stores}
+              onChanged={loadStores}
+            />
+          </article>
+        </>
+      )}
       <article className="card">
-        <CreateVendorForm onCreated={loadVendors} />
-      </article>
-      <article className="card">
-        <h3>Vendedores registrados ({vendors.length})</h3>
-        {actionFeedback && (
-          <p className="feedback feedback--success">{actionFeedback}</p>
+        <h3>Moderacion de resenas ({reviews.length})</h3>
+        {reviewFeedback && (
+          <p className={`feedback feedback--${reviewFeedback.type}`}>
+            {reviewFeedback.message}
+          </p>
         )}
-        <VendorTable vendors={vendors} onDeactivate={handleDeactivate} />
+        {reviewStatus === 'loading' && <p>Cargando resenas...</p>}
+        {reviewStatus === 'error' && (
+          <button type="button" className="button-link" onClick={loadReviews}>
+            Reintentar
+          </button>
+        )}
+        {reviewStatus === 'ready' && (
+          <ReviewModerationTable
+            reviews={reviews}
+            onRemove={handleRemoveReview}
+          />
+        )}
       </article>
     </section>
   )

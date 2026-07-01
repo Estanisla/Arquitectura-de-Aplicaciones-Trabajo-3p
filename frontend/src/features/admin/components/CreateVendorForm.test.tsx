@@ -177,7 +177,9 @@ describe('CreateVendorForm', () => {
     )
 
     expect(
-      await screen.findByText('Error de conexion'),
+      await screen.findByText(
+        'No se pudo completar la solicitud. Intenta nuevamente.',
+      ),
     ).toBeInTheDocument()
   })
 
@@ -204,7 +206,9 @@ describe('CreateVendorForm', () => {
     )
 
     expect(
-      await screen.findByText('Error inesperado'),
+      await screen.findByText(
+        'No se pudo completar la solicitud. Intenta nuevamente.',
+      ),
     ).toBeInTheDocument()
   })
 
@@ -273,7 +277,9 @@ describe('CreateVendorForm', () => {
     )
 
     expect(
-      await screen.findByText('El username ya existe'),
+      await screen.findByText(
+        'No se pudo completar la solicitud. Intenta nuevamente.',
+      ),
     ).toBeInTheDocument()
   })
 })

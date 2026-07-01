@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { fetchVendorProfile } from '../api/fetchVendorProfile'
 import { VendorProductGrid } from '../components/VendorProductGrid'
+import { VendorContactLinks } from '../components/VendorContactLinks'
 import type { VendorProfile } from '../vendor.types'
 
 type PageState =
@@ -53,7 +54,8 @@ export function VendorStorePage() {
     <div className="vendor-store-page">
       <h1>{vendor.display_name}</h1>
       {vendor.description && <p>{vendor.description}</p>}
-      <VendorProductGrid products={vendor.products} />
+      <VendorContactLinks contacts={vendor.contacts ?? []} />
+      <VendorProductGrid products={vendor.products} vendorId={vendor.vendor_id} />
     </div>
   )
 }

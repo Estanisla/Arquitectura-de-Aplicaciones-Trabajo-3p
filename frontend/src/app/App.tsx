@@ -7,7 +7,7 @@ import { AdminLoginPage } from '../features/auth/pages/AdminLoginPage'
 import { HomePage } from '../features/home/pages/HomePage'
 import { VendorListPage } from '../features/vendors/pages/VendorListPage'
 import { VendorStorePage } from '../features/vendors/pages/VendorStorePage'
-import { VendorAreaPlaceholderPage } from '../features/vendor/pages/VendorAreaPlaceholderPage'
+import { VendorDashboardPage } from '../features/vendor/pages/VendorDashboardPage'
 import { AdminPanelPage } from '../features/admin/pages/AdminPanelPage'
 import { ChangePasswordPage } from '../features/auth/pages/ChangePasswordPage'
 import { ProfilePage } from '../features/profile/pages/ProfilePage'
@@ -28,7 +28,7 @@ export function App() {
           path="/vendor"
           element={
             <RequireRoleRoute allowedRoles={['vendor']}>
-              <VendorAreaPlaceholderPage />
+              <VendorDashboardPage />
             </RequireRoleRoute>
           }
         />

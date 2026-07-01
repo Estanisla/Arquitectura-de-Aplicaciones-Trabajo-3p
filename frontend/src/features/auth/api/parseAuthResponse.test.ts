@@ -27,7 +27,7 @@ describe('parseAuthResponse', () => {
 
     await expect(
       parseAuthResponse(response, 'Register'),
-    ).rejects.toThrow('Register response without body (status 500)')
+    ).rejects.toThrow('No se pudo completar la solicitud. Intenta nuevamente.')
   })
 
   it('rejects invalid JSON', async () => {
@@ -35,6 +35,6 @@ describe('parseAuthResponse', () => {
 
     await expect(
       parseAuthResponse(response, 'Login'),
-    ).rejects.toThrow('Login response invalid JSON (status 200)')
+    ).rejects.toThrow('No se pudo completar la solicitud. Intenta nuevamente.')
   })
 })

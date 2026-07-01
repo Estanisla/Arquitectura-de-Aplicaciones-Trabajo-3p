@@ -17,4 +17,10 @@ export interface VendorProfile {
   display_name: string
   description: string | null
   products: ProductPreview[]
+  contacts?: StoreContact[]
+}
+
+export interface StoreContact {
+  channel: 'whatsapp' | 'instagram' | 'facebook' | 'email' | 'website'
+  value: string
 }

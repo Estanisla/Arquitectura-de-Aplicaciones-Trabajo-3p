@@ -8,7 +8,7 @@ export function ChangePasswordPage() {
 
   const handleSuccess = async () => {
     await refreshSession()
-    navigate('/profile', { replace: true })
+    navigate('/vendor', { replace: true })
   }
 
   return <ChangePasswordForm onSuccess={handleSuccess} />

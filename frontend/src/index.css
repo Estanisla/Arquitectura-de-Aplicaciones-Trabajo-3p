@@ -348,6 +348,91 @@ body {
   color: #b91c1c;
 }
 
+.feedback--success {
+  color: #166534;
+}
+
+.admin-table-wrapper {
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.admin-table th,
+.admin-table td {
+  padding: 0.7rem;
+  border-bottom: 1px solid #e2e8f0;
+  text-align: left;
+  vertical-align: top;
+}
+
+.admin-table th {
+  color: #334155;
+  font-size: 0.85rem;
+}
+
+.admin-table__comment {
+  min-width: 240px;
+  max-width: 520px;
+  overflow-wrap: anywhere;
+}
+
+.store-management-form {
+  max-width: 920px;
+}
+
+.form-subsection {
+  display: grid;
+  gap: 0.85rem;
+  margin: 0;
+  padding: 1rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 0.75rem;
+}
+
+.form-subsection legend {
+  padding: 0 0.35rem;
+  color: #334155;
+  font-weight: 700;
+}
+
+.member-row {
+  display: grid;
+  grid-template-columns: minmax(120px, 0.7fr) repeat(2, minmax(180px, 1fr)) auto;
+  gap: 0.75rem;
+  align-items: end;
+  padding-bottom: 0.85rem;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.compact-list {
+  display: grid;
+  gap: 0.3rem;
+  margin: 0;
+  padding-left: 1.1rem;
+}
+
+.store-contact-section {
+  display: grid;
+  gap: 0.75rem;
+  margin: 1rem 0;
+}
+
+.store-contact-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+}
+
+.button-link--danger {
+  border-color: #b91c1c;
+  background: #b91c1c;
+}
+
 .inline-link {
   color: #0b3558;
   font-weight: 600;
@@ -363,6 +448,53 @@ body {
   font-size: 0.9rem;
 }
 
+.button-link--compact {
+  margin: 0.25rem;
+  padding: 0.45rem 0.7rem;
+  font-size: 0.85rem;
+}
+
+.inline-management-form,
+.review-form,
+.product-create-form {
+  display: grid;
+  gap: 0.6rem;
+  margin-top: 0.8rem;
+}
+
+.inline-management-form {
+  grid-template-columns: minmax(8rem, 1fr) minmax(8rem, 1fr) auto;
+}
+
+.contact-editor {
+  display: grid;
+  gap: 0.5rem;
+  min-width: 14rem;
+}
+
+.vendor-settings-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr));
+  gap: 1.25rem;
+}
+
+.vendor-store-selector {
+  max-width: 24rem;
+  margin-top: 1rem;
+}
+
+.product-reviews {
+  border-top: 1px solid #cbd5e1;
+  margin-top: 1rem;
+  padding-top: 0.75rem;
+}
+
+.review-list {
+  display: grid;
+  gap: 0.5rem;
+  padding-left: 1.2rem;
+}
+
 @media (max-width: 820px) {
   .home-hero,
   .store-grid {
@@ -375,6 +507,14 @@ body {
 
   .store-card__rating {
     justify-items: start;
+  }
+
+  .member-row {
+    grid-template-columns: 1fr;
+  }
+
+  .inline-management-form {
+    grid-template-columns: 1fr;
   }
 }
 

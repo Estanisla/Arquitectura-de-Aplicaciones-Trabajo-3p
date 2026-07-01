@@ -109,7 +109,7 @@ test("authController.login returns 500 when the service throws", async () => {
   assert.equal(state.statusCode, 500);
   assert.deepEqual(state.jsonBody, {
     ok: false,
-    message: "rpc exploded",
+    message: "No se pudo iniciar sesion",
   });
 });
 
@@ -201,7 +201,7 @@ test("authController.adminLogin returns 500 when the service throws", async () =
   assert.equal(state.statusCode, 500);
   assert.deepEqual(state.jsonBody, {
     ok: false,
-    message: "admin rpc exploded",
+    message: "No se pudo iniciar sesion",
   });
 });
 
@@ -220,7 +220,7 @@ test("authController.adminLogin returns 500 when the service throws a non-Error"
   assert.equal(state.statusCode, 500);
   assert.deepEqual(state.jsonBody, {
     ok: false,
-    message: "Unknown admin login error",
+    message: "No se pudo iniciar sesion",
   });
 });
 
@@ -322,7 +322,7 @@ test("authController.login returns 500 when the service throws a non-Error", asy
   assert.equal(state.statusCode, 500);
   assert.deepEqual(state.jsonBody, {
     ok: false,
-    message: "Unknown login error",
+    message: "No se pudo iniciar sesion",
   });
 });
 
@@ -341,7 +341,7 @@ test("authController.register returns 500 when the service throws an Error", asy
   assert.equal(state.statusCode, 500);
   assert.deepEqual(state.jsonBody, {
     ok: false,
-    message: "register exploded",
+    message: "No se pudo completar el registro",
   });
 });
 
@@ -360,7 +360,7 @@ test("authController.register returns 500 when the service throws a non-Error", 
   assert.equal(state.statusCode, 500);
   assert.deepEqual(state.jsonBody, {
     ok: false,
-    message: "Unknown register error",
+    message: "No se pudo completar el registro",
   });
 });
 
@@ -483,7 +483,7 @@ test("authController.changePassword returns 500 when service throws a generic Er
   assert.equal(state.statusCode, 500);
   assert.deepEqual(state.jsonBody, {
     ok: false,
-    message: "generic error",
+    message: "No se pudo cambiar la contrasena",
   });
 });
 
