@@ -7,7 +7,10 @@ export const vendorController = {
     try {
       const vendors = await vendorService.listVendors();
       return res.status(200).json({ vendors });
-    } catch {
+    } catch (error) {
+      if (error instanceof AppError) {
+        return res.status(error.status).json({ message: error.message });
+      }
       return res.status(500).json({ message: "Error interno" });
     }
   },
