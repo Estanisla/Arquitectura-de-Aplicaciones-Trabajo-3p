@@ -1,30 +1,7 @@
 import type { Request, Response } from "express";
 import { AppError } from "../../shared/AppError.js";
-import {
-  readSessionRoleFromRequest,
-  readSessionUserIdFromRequest,
-} from "../auth/auth.session.js";
+import { requireAdmin } from "../../shared/requireAdmin.js";
 import { adminPanelService } from "./admin-panel.service.js";
-
-const requireAdmin = (
-  req: Request,
-  res: Response,
-): string | null => {
-  const userId = readSessionUserIdFromRequest(req);
-  const role = readSessionRoleFromRequest(req);
-
-  if (!userId || !role) {
-    res.status(403).json({ ok: false, message: "No autorizado" });
-    return null;
-  }
-
-  if (role !== "admin") {
-    res.status(403).json({ ok: false, message: "Se requieren permisos de administrador" });
-    return null;
-  }
-
-  return userId;
-};
 
 export const adminPanelController = {
   async createVendor(req: Request, res: Response) {

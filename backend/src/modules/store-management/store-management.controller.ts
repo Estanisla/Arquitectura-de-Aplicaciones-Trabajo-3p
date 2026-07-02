@@ -1,23 +1,8 @@
 import type { Request, Response } from "express";
 import { AppError } from "../../shared/AppError.js";
-import {
-  readSessionRoleFromRequest,
-  readSessionUserIdFromRequest,
-} from "../auth/auth.session.js";
+import { requireAdmin } from "../../shared/requireAdmin.js";
 import { storeManagementService } from "./store-management.service.js";
 import type { CreateManagedStoreInput } from "./store-management.types.js";
-
-const requireAdmin = (req: Request, res: Response): string | null => {
-  const adminId = readSessionUserIdFromRequest(req);
-  const role = readSessionRoleFromRequest(req);
-
-  if (!adminId || role !== "admin") {
-    res.status(403).json({ ok: false, message: "No autorizado" });
-    return null;
-  }
-
-  return adminId;
-};
 
 const sendError = (res: Response, error: unknown) => {
   if (error instanceof AppError) {
