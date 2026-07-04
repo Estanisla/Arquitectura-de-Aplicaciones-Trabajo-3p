@@ -22,6 +22,7 @@ export function VendorLoginForm({
 }: VendorLoginFormProps) {
   const [credentials, setCredentials] = useState(initialCredentials)
   const [status, setStatus] = useState<FormStatus>('idle')
+  const [isLoading, setIsLoading] = useState(false)
   const [feedback, setFeedback] = useState(initialFeedback)
 
   const updateField = (field: 'username' | 'password', value: string) => {
@@ -31,6 +32,7 @@ export function VendorLoginForm({
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     setStatus('loading')
+    setIsLoading(true)
     setFeedback('')
 
     try {
@@ -50,6 +52,8 @@ export function VendorLoginForm({
         error instanceof Error ? error.message : 'Error inesperado en login'
       setStatus('error')
       setFeedback(message)
+    } finally {
+      setIsLoading(false)
     }
   }
 
@@ -82,8 +86,8 @@ export function VendorLoginForm({
         />
       </label>
 
-      <button type="submit" className="button-link" disabled={status === 'loading'}>
-        {status === 'loading' ? 'Validando...' : 'Ingresar'}
+      <button type="submit" className="button-link" disabled={isLoading}>
+        {isLoading ? 'Cargando...' : 'Ingresar'}
       </button>
 
       {feedback && (
