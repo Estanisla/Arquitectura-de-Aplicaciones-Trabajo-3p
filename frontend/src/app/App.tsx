@@ -7,6 +7,7 @@ import { AdminLoginPage } from '../features/auth/pages/AdminLoginPage'
 import { HomePage } from '../features/home/pages/HomePage'
 import { VendorListPage } from '../features/vendors/pages/VendorListPage'
 import { VendorStorePage } from '../features/vendors/pages/VendorStorePage'
+import { VendorReviewsPage } from '../features/vendors/pages/VendorReviewsPage'
 import { VendorDashboardPage } from '../features/vendor/pages/VendorDashboardPage'
 import { AdminPanelPage } from '../features/admin/pages/AdminPanelPage'
 import { ChangePasswordPage } from '../features/auth/pages/ChangePasswordPage'
@@ -19,6 +20,7 @@ export function App() {
         <Route index element={<HomePage />} />
         <Route path="/tiendas" element={<VendorListPage />} />
         <Route path="/tiendas/:vendorId" element={<VendorStorePage />} />
+        <Route path="/tiendas/:vendorId/resenas" element={<VendorReviewsPage />} />
         <Route path="/auth/login" element={<VendorLoginPage />} />
         <Route path="/auth/register" element={<VendorRegisterPage />} />
         <Route path="/auth/lg-admin" element={<AdminLoginPage />} />

@@ -5,3 +5,4 @@ export const vendorRouter = Router();
 
 vendorRouter.get("/", vendorController.list);
 vendorRouter.get("/:vendorId", vendorController.getProfile);
+vendorRouter.get("/:vendorId/reviews", vendorController.getReviews);

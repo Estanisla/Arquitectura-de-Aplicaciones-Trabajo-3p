@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { Link, useParams } from 'react-router-dom'
 import { fetchVendorProfile } from '../api/fetchVendorProfile'
 import { VendorProductGrid } from '../components/VendorProductGrid'
 import { VendorContactLinks } from '../components/VendorContactLinks'
@@ -55,6 +55,11 @@ export function VendorStorePage() {
       <h1>{vendor.display_name}</h1>
       {vendor.description && <p>{vendor.description}</p>}
       <VendorContactLinks contacts={vendor.contacts ?? []} />
+      <p>
+        <Link to={`/tiendas/${vendor.vendor_id}/resenas`} className="inline-link">
+          Ver todas las resenas
+        </Link>
+      </p>
       <VendorProductGrid products={vendor.products} vendorId={vendor.vendor_id} />
     </div>
   )
