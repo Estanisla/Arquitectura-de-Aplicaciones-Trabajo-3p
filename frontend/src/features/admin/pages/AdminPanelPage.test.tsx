@@ -1,6 +1,11 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import type { ReactElement } from 'react'
 import { cleanup, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { MemoryRouter } from 'react-router-dom'
+
+const renderWithRouter = (ui: ReactElement) =>
+  render(<MemoryRouter>{ui}</MemoryRouter>)
 
 const mockFetchManagedStores = vi.fn()
 const mockFetchReviews = vi.fn()
@@ -62,7 +67,7 @@ afterEach(() => {
 describe('AdminPanelPage', () => {
   it('shows the emporium, stores, members and contacts', async () => {
     const { AdminPanelPage } = await import('./AdminPanelPage.tsx')
-    render(<AdminPanelPage />)
+    renderWithRouter(<AdminPanelPage />)
 
     expect(
       await screen.findByText('Emporio Azul: tiendas (1)'),
@@ -93,7 +98,7 @@ describe('AdminPanelPage', () => {
     ])
 
     const { AdminPanelPage } = await import('./AdminPanelPage.tsx')
-    render(<AdminPanelPage />)
+    renderWithRouter(<AdminPanelPage />)
 
     expect(
       await screen.findByText('Gestion de tiendas no disponible'),
@@ -123,7 +128,7 @@ describe('AdminPanelPage', () => {
     removeReview.mockResolvedValue()
 
     const { AdminPanelPage } = await import('./AdminPanelPage.tsx')
-    render(<AdminPanelPage />)
+    renderWithRouter(<AdminPanelPage />)
     const user = userEvent.setup()
     await user.click(await screen.findByRole('button', { name: 'Eliminar' }))
 
@@ -141,7 +146,7 @@ describe('AdminPanelPage', () => {
       .mockResolvedValueOnce(managedStores)
 
     const { AdminPanelPage } = await import('./AdminPanelPage.tsx')
-    render(<AdminPanelPage />)
+    renderWithRouter(<AdminPanelPage />)
     const user = userEvent.setup()
 
     await user.click(await screen.findByRole('button', { name: 'Reintentar' }))
