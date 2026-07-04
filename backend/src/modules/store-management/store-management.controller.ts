@@ -1,5 +1,6 @@
 import type { Request, Response } from "express";
 import { AppError } from "../../shared/AppError.js";
+import { logError } from "../../shared/logError.js";
 import {
   readSessionRoleFromRequest,
   readSessionUserIdFromRequest,
@@ -27,6 +28,7 @@ const sendError = (res: Response, error: unknown) => {
     return res.status(error.status).json({ ok: false, message });
   }
 
+  logError("store-management", error);
   return res
     .status(500)
     .json({ ok: false, message: "No se pudo completar la solicitud" });

@@ -1,5 +1,6 @@
 import type { Request, Response } from "express";
 import { AppError } from "../../shared/AppError.js";
+import { logError } from "../../shared/logError.js";
 import {
   readSessionRoleFromRequest,
   readSessionUserIdFromRequest,
@@ -26,6 +27,7 @@ const sendError = (res: Response, error: unknown) => {
       .json({ ok: false, message: publicErrorMessage(error.status) });
   }
 
+  logError("reviews", error);
   return res
     .status(500)
     .json({ ok: false, message: "No se pudo completar la solicitud" });

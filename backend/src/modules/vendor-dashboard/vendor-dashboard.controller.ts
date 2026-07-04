@@ -1,5 +1,6 @@
 import type { Request, Response } from "express";
 import { AppError } from "../../shared/AppError.js";
+import { logError } from "../../shared/logError.js";
 import { vendorDashboardService } from "./vendor-dashboard.service.js";
 import type {
   ProductInput,
@@ -14,6 +15,7 @@ const sendError = (res: Response, error: unknown) => {
       : "Solicitud invalida";
     return res.status(error.status).json({ ok: false, message });
   }
+  logError("vendor-dashboard", error);
   return res
     .status(500)
     .json({ ok: false, message: "No se pudo completar la solicitud" });

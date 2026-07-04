@@ -1,5 +1,6 @@
 import type { Request, Response } from "express";
 import { AppError } from "../../shared/AppError.js";
+import { logError } from "../../shared/logError.js";
 import {
   clearSessionCookie,
   readSessionRoleFromRequest,
@@ -30,7 +31,8 @@ export const authController = {
       }
       setSessionCookie(res, result.user_id!, "vendor");
       return res.status(200).json(result);
-    } catch {
+    } catch (error) {
+      logError("auth.login", error);
       return res.status(500).json({ ok: false, message: "No se pudo iniciar sesion" });
     }
   },
@@ -46,7 +48,8 @@ export const authController = {
       }
       setSessionCookie(res, result.admin_id!, "admin");
       return res.status(200).json(result);
-    } catch {
+    } catch (error) {
+      logError("auth.adminLogin", error);
       return res.status(500).json({ ok: false, message: "No se pudo iniciar sesion" });
     }
   },
@@ -61,7 +64,8 @@ export const authController = {
         return res.status(400).json(result);
       }
       return res.status(201).json(result);
-    } catch {
+    } catch (error) {
+      logError("auth.register", error);
       return res.status(500).json({ ok: false, message: "No se pudo completar el registro" });
     }
   },
@@ -116,6 +120,7 @@ export const authController = {
       if (error instanceof AppError) {
         return res.status(error.status).json({ ok: false, message: error.message });
       }
+      logError("auth.changePassword", error);
       return res.status(500).json({ ok: false, message: "No se pudo cambiar la contrasena" });
     }
   },

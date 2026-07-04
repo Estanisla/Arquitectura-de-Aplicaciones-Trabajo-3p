@@ -1,5 +1,6 @@
 import type { Request, Response } from "express";
 import { AppError } from "../../shared/AppError.js";
+import { logError } from "../../shared/logError.js";
 import { vendorService } from "./vendor.service.js";
 
 export const vendorController = {
@@ -11,6 +12,7 @@ export const vendorController = {
       if (error instanceof AppError) {
         return res.status(error.status).json({ message: error.message });
       }
+      logError("vendors", error);
       return res.status(500).json({ message: "Error interno" });
     }
   },
@@ -24,6 +26,7 @@ export const vendorController = {
       if (error instanceof AppError) {
         return res.status(error.status).json({ message: error.message });
       }
+      logError("vendors", error);
       return res.status(500).json({ message: "Error interno" });
     }
   },

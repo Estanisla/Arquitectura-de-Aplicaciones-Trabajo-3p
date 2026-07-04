@@ -1,5 +1,6 @@
 import type { Request, Response } from "express";
 import { AppError } from "../../shared/AppError.js";
+import { logError } from "../../shared/logError.js";
 import {
   readSessionRoleFromRequest,
   readSessionUserIdFromRequest,
@@ -47,6 +48,7 @@ export const adminPanelController = {
       if (error instanceof AppError) {
         return res.status(error.status).json({ ok: false, message: error.message });
       }
+      logError("admin-panel", error);
       return res.status(500).json({ ok: false, message: "Error interno" });
     }
   },
@@ -63,6 +65,7 @@ export const adminPanelController = {
       if (error instanceof AppError) {
         return res.status(error.status).json({ ok: false, message: error.message });
       }
+      logError("admin-panel", error);
       return res.status(500).json({ ok: false, message: "Error interno" });
     }
   },
@@ -82,6 +85,7 @@ export const adminPanelController = {
       if (error instanceof AppError) {
         return res.status(error.status).json({ ok: false, message: error.message });
       }
+      logError("admin-panel", error);
       return res.status(500).json({ ok: false, message: "Error interno" });
     }
   },
