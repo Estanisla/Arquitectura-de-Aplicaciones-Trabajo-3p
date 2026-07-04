@@ -58,6 +58,15 @@ export const authService = {
     const username = normalize(payload.username);
     const password = payload.password;
 
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(username)) {
+      const error = new Error("Formato de email inválido") as Error & {
+        status?: number;
+      };
+      error.status = 400;
+      throw error;
+    }
+
     const validationError = validateCredentials(payload);
     if (validationError) {
       return validationError;
