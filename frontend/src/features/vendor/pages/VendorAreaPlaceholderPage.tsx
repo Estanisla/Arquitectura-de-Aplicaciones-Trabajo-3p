@@ -1,4 +1,4 @@
-import { useLocation } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 
 type VendorRouteState = {
   loginMessage?: string
@@ -35,6 +35,9 @@ export function VendorAreaPlaceholderPage() {
           herramientas operativas de vendedor.
         </p>
       </article>
+      <Link to="/" className="button-link">
+        Volver al inicio
+      </Link>
     </section>
   )
 }
