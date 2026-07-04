@@ -33,9 +33,14 @@ export function AppShell() {
               </button>
             </>
           ) : (
-            <Link to="/auth/login" className="button-link button-link--secondary">
-              Login
-            </Link>
+            <>
+              <Link to="/auth/login" className="button-link button-link--secondary">
+                Login
+              </Link>
+              <Link to="/auth/lg-admin" className="button-link button-link--secondary">
+                Acceso admin
+              </Link>
+            </>
           )}
         </nav>
       </header>
