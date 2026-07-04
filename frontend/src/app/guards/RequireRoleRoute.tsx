@@ -27,7 +27,8 @@ export function RequireRoleRoute({
   }
 
   if (!role || !allowedRoles.includes(role)) {
-    return <Navigate to="/profile" replace />
+    const fallback = role === 'admin' ? '/admin' : '/profile'
+    return <Navigate to={fallback} replace />
   }
 
   return <>{children}</>
