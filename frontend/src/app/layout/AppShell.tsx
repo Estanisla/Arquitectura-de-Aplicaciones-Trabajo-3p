@@ -1,5 +1,6 @@
 import { Link, Outlet, useNavigate } from 'react-router-dom'
 import { useAuthSession } from '../../features/auth/session/useAuthSession'
+import { ThemeToggle } from '../../shared/components/ThemeToggle'
 
 export function AppShell() {
   const navigate = useNavigate()
@@ -17,6 +18,7 @@ export function AppShell() {
           Polos Azules
         </Link>
         <nav className="app-shell__actions" aria-label="Acceso vendedor">
+          <ThemeToggle />
           {status === 'loading' ? (
             <span className="app-shell__loading-text">Cargando sesion...</span>
           ) : isAuthenticated ? (
