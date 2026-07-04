@@ -15,3 +15,21 @@ export interface CreateVendorInput {
   displayName: string;
   description?: string;
 }
+
+export type AuditLogSource = "admins" | "users" | "vendors";
+
+export interface AuditLogEntry {
+  source: AuditLogSource;
+  event_time: string;
+  action: string;
+  table_name: string;
+  row_id: string | null;
+  actor: string | null;
+  reason: string | null;
+}
+
+export interface ListAuditLogsInput {
+  table?: AuditLogSource;
+  limit?: number;
+  offset?: number;
+}

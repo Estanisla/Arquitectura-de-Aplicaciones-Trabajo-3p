@@ -1,6 +1,16 @@
 import { AppError } from "../../shared/AppError.js";
 import { adminPanelRepository } from "./admin-panel.repository.js";
-import type { CreateVendorInput, VendorRow } from "./admin-panel.types.js";
+import type {
+  AuditLogEntry,
+  AuditLogSource,
+  CreateVendorInput,
+  ListAuditLogsInput,
+  VendorRow,
+} from "./admin-panel.types.js";
+
+const ALLOWED_AUDIT_SOURCES: readonly AuditLogSource[] = ["admins", "users", "vendors"];
+const AUDIT_LOG_MAX_LIMIT = 200;
+const AUDIT_LOG_DEFAULT_LIMIT = 50;
 
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -72,5 +82,26 @@ export const adminPanelService = {
       }
       throw new AppError(result.message ?? "Error al desactivar tienda", 400);
     }
+  },
+
+  async listAuditLogs(
+    adminId: string,
+    input: ListAuditLogsInput,
+  ): Promise<AuditLogEntry[]> {
+    if (!UUID_REGEX.test(adminId)) {
+      throw new AppError("ID de admin invalido", 400);
+    }
+
+    if (input.table !== undefined && !ALLOWED_AUDIT_SOURCES.includes(input.table)) {
+      throw new AppError("Origen de log invalido", 400);
+    }
+
+    const limit = Math.min(
+      Math.max(Number.isFinite(input.limit) ? Number(input.limit) : AUDIT_LOG_DEFAULT_LIMIT, 1),
+      AUDIT_LOG_MAX_LIMIT,
+    );
+    const offset = Math.max(Number.isFinite(input.offset) ? Number(input.offset) : 0, 0);
+
+    return adminPanelRepository.listAuditLogs(adminId, input.table ?? null, limit, offset);
   },
 };

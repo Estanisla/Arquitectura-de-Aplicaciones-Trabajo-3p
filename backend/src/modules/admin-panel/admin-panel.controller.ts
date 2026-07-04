@@ -85,4 +85,28 @@ export const adminPanelController = {
       return res.status(500).json({ ok: false, message: "Error interno" });
     }
   },
+
+  async listAuditLogs(req: Request, res: Response) {
+    try {
+      const adminId = requireAdmin(req, res);
+      if (!adminId) return;
+
+      const tableParam = typeof req.query.table === "string" ? req.query.table : undefined;
+      const limitParam = typeof req.query.limit === "string" ? Number(req.query.limit) : undefined;
+      const offsetParam = typeof req.query.offset === "string" ? Number(req.query.offset) : undefined;
+
+      const logs = await adminPanelService.listAuditLogs(adminId, {
+        table: tableParam as "admins" | "users" | "vendors" | undefined,
+        limit: limitParam,
+        offset: offsetParam,
+      });
+
+      return res.status(200).json({ ok: true, data: logs });
+    } catch (error) {
+      if (error instanceof AppError) {
+        return res.status(error.status).json({ ok: false, message: error.message });
+      }
+      return res.status(500).json({ ok: false, message: "Error interno" });
+    }
+  },
 };

@@ -6,3 +6,4 @@ export const adminPanelRouter = Router();
 adminPanelRouter.post("/vendors", adminPanelController.createVendor);
 adminPanelRouter.get("/vendors", adminPanelController.listVendors);
 adminPanelRouter.patch("/vendors/:vendorId/deactivate", adminPanelController.deactivateVendor);
+adminPanelRouter.get("/logs", adminPanelController.listAuditLogs);

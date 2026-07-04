@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { fetchReviews } from '../api/fetchReviews'
 import { removeReview } from '../api/removeReview'
 import { ReviewModerationTable } from '../components/ReviewModerationTable'
@@ -86,6 +87,11 @@ export function AdminPanelPage() {
       <article className="card">
         <h2>Panel company-admin</h2>
         <p>Gestion del emporio, tiendas, usuarios y moderacion.</p>
+        <p>
+          <Link to="/admin/logs" className="inline-link">
+            Ver auditoria de eventos
+          </Link>
+        </p>
       </article>
       {status === 'loading' && (
         <article className="card">
