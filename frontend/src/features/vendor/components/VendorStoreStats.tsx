@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import type { VendorProduct, VendorReview } from '../vendorDashboard.types'
 
 type VendorStoreStatsProps = {
@@ -21,7 +22,9 @@ export function VendorStoreStats({ products, reviews }: VendorStoreStatsProps) {
       ? reviews.reduce((sum, review) => sum + review.rating, 0) / totalReviews
       : 0
 
-  const now = Date.now()
+  // Capture "now" on mount so the render stays pure; the stats are a
+  // rough summary and a page reload is enough to refresh the window.
+  const [now] = useState(() => Date.now())
   const last7Days = countReviewsSince(reviews, now - 7 * DAY_MS)
   const last30Days = countReviewsSince(reviews, now - 30 * DAY_MS)
 
