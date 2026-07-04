@@ -1,10 +1,11 @@
-import { Navigate, Route, Routes } from 'react-router-dom'
+import { Route, Routes } from 'react-router-dom'
 import { AppShell } from './layout/AppShell'
 import { RequireRoleRoute } from './guards/RequireRoleRoute'
 import { VendorLoginPage } from '../features/auth/pages/VendorLoginPage'
 import { VendorRegisterPage } from '../features/auth/pages/VendorRegisterPage'
 import { AdminLoginPage } from '../features/auth/pages/AdminLoginPage'
 import { HomePage } from '../features/home/pages/HomePage'
+import { NotFoundPage } from '../features/home/pages/NotFoundPage'
 import { VendorListPage } from '../features/vendors/pages/VendorListPage'
 import { VendorStorePage } from '../features/vendors/pages/VendorStorePage'
 import { VendorDashboardPage } from '../features/vendor/pages/VendorDashboardPage'
@@ -40,8 +41,8 @@ export function App() {
             </RequireRoleRoute>
           }
         />
+        <Route path="*" element={<NotFoundPage />} />
       </Route>
-      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   )
 }
