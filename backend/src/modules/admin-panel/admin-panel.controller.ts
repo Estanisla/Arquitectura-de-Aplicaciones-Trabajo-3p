@@ -85,4 +85,34 @@ export const adminPanelController = {
       return res.status(500).json({ ok: false, message: "Error interno" });
     }
   },
+
+  async hardDeleteUser(req: Request, res: Response) {
+    try {
+      const adminId = requireAdmin(req, res);
+      if (!adminId) return;
+
+      const body = req.body as { reason?: string; confirm?: string };
+      if (body.confirm !== "ELIMINAR") {
+        return res.status(400).json({
+          ok: false,
+          message: 'Confirma la accion enviando confirm="ELIMINAR"',
+        });
+      }
+
+      await adminPanelService.hardDeleteUser(
+        adminId,
+        req.params.userId as string,
+        body.reason ?? "",
+      );
+
+      return res
+        .status(200)
+        .json({ ok: true, message: "Usuario eliminado (hard)" });
+    } catch (error) {
+      if (error instanceof AppError) {
+        return res.status(error.status).json({ ok: false, message: error.message });
+      }
+      return res.status(500).json({ ok: false, message: "Error interno" });
+    }
+  },
 };

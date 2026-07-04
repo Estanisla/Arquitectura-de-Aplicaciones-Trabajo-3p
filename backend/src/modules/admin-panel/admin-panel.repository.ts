@@ -67,4 +67,22 @@ export const adminPanelRepository = {
 
     return data as RpcResult;
   },
+
+  async hardDeleteUser(
+    adminId: string,
+    userId: string,
+    reason: string,
+  ): Promise<RpcResult> {
+    const { data, error } = await supabaseAdmin.rpc("admin_hard_delete_user", {
+      p_admin_id: adminId,
+      p_user_id: userId,
+      p_reason: reason,
+    });
+
+    if (error) {
+      throw new Error(`Supabase RPC admin_hard_delete_user failed: ${error.message}`);
+    }
+
+    return data as RpcResult;
+  },
 };

@@ -73,4 +73,42 @@ export const adminPanelService = {
       throw new AppError(result.message ?? "Error al desactivar tienda", 400);
     }
   },
+
+  async hardDeleteUser(
+    adminId: string,
+    userId: string,
+    reason: string,
+  ): Promise<void> {
+    if (!UUID_REGEX.test(adminId)) {
+      throw new AppError("ID de admin invalido", 400);
+    }
+
+    if (!UUID_REGEX.test(userId)) {
+      throw new AppError("ID de usuario invalido", 400);
+    }
+
+    const trimmedReason = reason.trim();
+    if (trimmedReason.length < 10) {
+      throw new AppError(
+        "Se requiere una razon explicita de al menos 10 caracteres",
+        400,
+      );
+    }
+
+    const result = await adminPanelRepository.hardDeleteUser(
+      adminId,
+      userId,
+      trimmedReason,
+    );
+
+    if (!result.ok) {
+      if (result.message?.includes("no encontrado")) {
+        throw new AppError(result.message, 404);
+      }
+      if (result.message?.includes("no autorizado")) {
+        throw new AppError(result.message, 403);
+      }
+      throw new AppError(result.message ?? "Error al eliminar usuario", 400);
+    }
+  },
 };
