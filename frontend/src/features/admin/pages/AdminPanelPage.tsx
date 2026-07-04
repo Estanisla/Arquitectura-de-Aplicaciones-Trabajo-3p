@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { fetchReviews } from '../api/fetchReviews'
 import { removeReview } from '../api/removeReview'
 import { ReviewModerationTable } from '../components/ReviewModerationTable'
@@ -123,6 +124,11 @@ export function AdminPanelPage() {
       )}
       <article className="card">
         <h3>Moderacion de resenas ({reviews.length})</h3>
+        <p>
+          <Link to="/admin/reviews" className="inline-link">
+            Abrir vista dedicada con filtros
+          </Link>
+        </p>
         {reviewFeedback && (
           <p className={`feedback feedback--${reviewFeedback.type}`}>
             {reviewFeedback.message}

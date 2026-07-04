@@ -9,6 +9,7 @@ import { VendorListPage } from '../features/vendors/pages/VendorListPage'
 import { VendorStorePage } from '../features/vendors/pages/VendorStorePage'
 import { VendorDashboardPage } from '../features/vendor/pages/VendorDashboardPage'
 import { AdminPanelPage } from '../features/admin/pages/AdminPanelPage'
+import { AdminReviewsModerationPage } from '../features/admin/pages/AdminReviewsModerationPage'
 import { ChangePasswordPage } from '../features/auth/pages/ChangePasswordPage'
 import { ProfilePage } from '../features/profile/pages/ProfilePage'
 
@@ -37,6 +38,14 @@ export function App() {
           element={
             <RequireRoleRoute allowedRoles={['admin']}>
               <AdminPanelPage />
+            </RequireRoleRoute>
+          }
+        />
+        <Route
+          path="/admin/reviews"
+          element={
+            <RequireRoleRoute allowedRoles={['admin']}>
+              <AdminReviewsModerationPage />
             </RequireRoleRoute>
           }
         />
