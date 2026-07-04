@@ -58,8 +58,18 @@ export const authService = {
     const username = normalize(payload.username);
     const password = payload.password;
 
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(username)) {
+    const atIndex = username.indexOf("@");
+    if (atIndex < 1 || atIndex === username.length - 1) {
+      const error = new Error("Formato de email inválido") as Error & {
+        status?: number;
+      };
+      error.status = 400;
+      throw error;
+    }
+
+    const domainPart = username.slice(atIndex + 1);
+    const dotIndex = domainPart.lastIndexOf(".");
+    if (dotIndex < 1 || dotIndex === domainPart.length - 1) {
       const error = new Error("Formato de email inválido") as Error & {
         status?: number;
       };
