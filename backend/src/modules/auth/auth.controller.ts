@@ -119,4 +119,49 @@ export const authController = {
       return res.status(500).json({ ok: false, message: "No se pudo cambiar la contrasena" });
     }
   },
+
+  async forgotPassword(req: Request, res: Response) {
+    try {
+      const body = req.body as { username?: string };
+      const result = await authService.requestPasswordReset(body.username ?? "");
+      // Always 200 to avoid username enumeration. The token field is
+      // only present in dev/non-production environments so a caller
+      // can complete the reset without email delivery configured.
+      const publicResult: { ok: boolean; message: string; token?: string; expires_at?: string } = {
+        ok: result.ok,
+        message: result.message,
+      };
+
+      if (result.token && process.env.NODE_ENV !== "production") {
+        publicResult.token = result.token;
+        publicResult.expires_at = result.expires_at;
+      }
+
+      return res.status(200).json(publicResult);
+    } catch {
+      return res
+        .status(500)
+        .json({ ok: false, message: "No se pudo procesar la solicitud" });
+    }
+  },
+
+  async resetPassword(req: Request, res: Response) {
+    try {
+      const body = req.body as { token?: string; newPassword?: string };
+      await authService.completePasswordReset(
+        body.token ?? "",
+        body.newPassword ?? "",
+      );
+      return res
+        .status(200)
+        .json({ ok: true, message: "Contrasena actualizada correctamente" });
+    } catch (error) {
+      if (error instanceof AppError) {
+        return res.status(error.status).json({ ok: false, message: error.message });
+      }
+      return res
+        .status(500)
+        .json({ ok: false, message: "No se pudo cambiar la contrasena" });
+    }
+  },
 };

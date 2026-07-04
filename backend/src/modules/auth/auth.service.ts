@@ -105,4 +105,32 @@ export const authService = {
       throw new AppError(result.message, 400);
     }
   },
+
+  async requestPasswordReset(
+    username: string,
+  ): Promise<{ ok: boolean; message: string; token?: string; expires_at?: string }> {
+    return authRepository.requestPasswordReset(normalize(username));
+  },
+
+  async completePasswordReset(
+    token: string,
+    newPassword: string,
+  ): Promise<void> {
+    if (!token || token.trim().length < 32) {
+      throw new AppError("Token invalido", 400);
+    }
+
+    if (!newPassword || newPassword.length < 6) {
+      throw new AppError("La nueva contrasena debe tener al menos 6 caracteres", 400);
+    }
+
+    const result = await authRepository.completePasswordReset(
+      token.trim(),
+      newPassword,
+    );
+
+    if (!result.ok) {
+      throw new AppError(result.message, 400);
+    }
+  },
 };

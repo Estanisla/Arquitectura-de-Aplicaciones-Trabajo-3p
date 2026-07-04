@@ -92,6 +92,11 @@ export function VendorLoginForm({
       )}
 
       <p className="auth-secondary-link">
+        <Link to="/auth/forgot-password" className="inline-link">
+          Olvide mi contrasena
+        </Link>
+      </p>
+      <p className="auth-secondary-link">
         <Link to="/auth/lg-admin" className="inline-link">
           Acceso de administrador
         </Link>

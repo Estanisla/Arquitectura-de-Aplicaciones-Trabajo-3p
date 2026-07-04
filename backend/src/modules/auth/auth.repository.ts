@@ -69,4 +69,34 @@ export const authRepository = {
 
     return data as ChangePasswordResult;
   },
+
+  async requestPasswordReset(
+    username: string,
+  ): Promise<{ ok: boolean; message: string; token?: string; expires_at?: string }> {
+    const { data, error } = await supabaseAdmin.rpc("user_password_reset_request", {
+      p_username: username,
+    });
+
+    if (error) {
+      throw new Error(`Supabase RPC user_password_reset_request failed: ${error.message}`);
+    }
+
+    return data as { ok: boolean; message: string; token?: string; expires_at?: string };
+  },
+
+  async completePasswordReset(
+    token: string,
+    newPassword: string,
+  ): Promise<{ ok: boolean; message: string }> {
+    const { data, error } = await supabaseAdmin.rpc("user_password_reset_complete", {
+      p_token: token,
+      p_new_password: newPassword,
+    });
+
+    if (error) {
+      throw new Error(`Supabase RPC user_password_reset_complete failed: ${error.message}`);
+    }
+
+    return data as { ok: boolean; message: string };
+  },
 };

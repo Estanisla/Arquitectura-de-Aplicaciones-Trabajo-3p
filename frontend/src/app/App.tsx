@@ -10,6 +10,8 @@ import { VendorStorePage } from '../features/vendors/pages/VendorStorePage'
 import { VendorDashboardPage } from '../features/vendor/pages/VendorDashboardPage'
 import { AdminPanelPage } from '../features/admin/pages/AdminPanelPage'
 import { ChangePasswordPage } from '../features/auth/pages/ChangePasswordPage'
+import { ForgotPasswordPage } from '../features/auth/pages/ForgotPasswordPage'
+import { ResetPasswordPage } from '../features/auth/pages/ResetPasswordPage'
 import { ProfilePage } from '../features/profile/pages/ProfilePage'
 
 export function App() {
@@ -23,6 +25,8 @@ export function App() {
         <Route path="/auth/register" element={<VendorRegisterPage />} />
         <Route path="/auth/lg-admin" element={<AdminLoginPage />} />
         <Route path="/auth/change-password" element={<ChangePasswordPage />} />
+        <Route path="/auth/forgot-password" element={<ForgotPasswordPage />} />
+        <Route path="/auth/reset-password" element={<ResetPasswordPage />} />
         <Route path="/profile" element={<ProfilePage />} />
         <Route
           path="/vendor"
