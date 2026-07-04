@@ -134,7 +134,9 @@ export const authController = {
 
       if (result.token && process.env.NODE_ENV !== "production") {
         publicResult.token = result.token;
-        publicResult.expires_at = result.expires_at;
+        if (result.expires_at) {
+          publicResult.expires_at = result.expires_at;
+        }
       }
 
       return res.status(200).json(publicResult);
