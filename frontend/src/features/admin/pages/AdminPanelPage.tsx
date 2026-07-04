@@ -26,6 +26,7 @@ export function AdminPanelPage() {
   })
   const [status, setStatus] = useState<PageStatus>('loading')
   const [errorMessage, setErrorMessage] = useState('')
+  const [storeFilter, setStoreFilter] = useState('')
   const [reviews, setReviews] = useState<AdminReviewItem[]>([])
   const [reviewStatus, setReviewStatus] = useState<ReviewStatus>('loading')
   const [reviewFeedback, setReviewFeedback] = useState<ActionFeedback>(null)
@@ -101,26 +102,47 @@ export function AdminPanelPage() {
           </button>
         </article>
       )}
-      {status === 'ready' && (
-        <>
-          <article className="card">
-            <CreateManagedStoreForm
-              currentEmporiumName={managedStores.emporium_name}
-              onCreated={loadStores}
-            />
-          </article>
-          <article className="card">
-            <h3>
-              {managedStores.emporium_name ?? 'Emporio sin configurar'}: tiendas
-              ({managedStores.stores.length})
-            </h3>
-            <ManagedStoreTable
-              stores={managedStores.stores}
-              onChanged={loadStores}
-            />
-          </article>
-        </>
-      )}
+      {status === 'ready' && (() => {
+        const normalizedFilter = storeFilter.trim().toLowerCase()
+        const filteredStores = normalizedFilter
+          ? managedStores.stores.filter((store) => {
+              if (store.display_name.toLowerCase().includes(normalizedFilter)) return true
+              if (store.description?.toLowerCase().includes(normalizedFilter)) return true
+              return store.members.some((member) =>
+                member.username.toLowerCase().includes(normalizedFilter),
+              )
+            })
+          : managedStores.stores
+        return (
+          <>
+            <article className="card">
+              <CreateManagedStoreForm
+                currentEmporiumName={managedStores.emporium_name}
+                onCreated={loadStores}
+              />
+            </article>
+            <article className="card">
+              <h3>
+                {managedStores.emporium_name ?? 'Emporio sin configurar'}: tiendas
+                ({filteredStores.length}/{managedStores.stores.length})
+              </h3>
+              <label className="field">
+                <span>Buscar por tienda o usuario</span>
+                <input
+                  type="search"
+                  value={storeFilter}
+                  onChange={(event) => setStoreFilter(event.target.value)}
+                  placeholder="Nombre de tienda, descripcion o usuario"
+                />
+              </label>
+              <ManagedStoreTable
+                stores={filteredStores}
+                onChanged={loadStores}
+              />
+            </article>
+          </>
+        )
+      })()}
       <article className="card">
         <h3>Moderacion de resenas ({reviews.length})</h3>
         {reviewFeedback && (
