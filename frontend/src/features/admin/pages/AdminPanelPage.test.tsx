@@ -65,7 +65,7 @@ describe('AdminPanelPage', () => {
     render(<AdminPanelPage />)
 
     expect(
-      await screen.findByText('Emporio Azul: tiendas (1)'),
+      await screen.findByText('Emporio Azul: tiendas (1/1)'),
     ).toBeInTheDocument()
     expect(screen.getByText('Tienda Central')).toBeInTheDocument()
     expect(
@@ -147,7 +147,7 @@ describe('AdminPanelPage', () => {
     await user.click(await screen.findByRole('button', { name: 'Reintentar' }))
 
     expect(
-      await screen.findByText('Emporio Azul: tiendas (1)'),
+      await screen.findByText('Emporio Azul: tiendas (1/1)'),
     ).toBeInTheDocument()
   })
 })
