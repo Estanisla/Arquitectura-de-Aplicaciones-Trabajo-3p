@@ -39,6 +39,8 @@ export function AdminReviewsModerationPage() {
   }, [])
 
   useEffect(() => {
+    // Initial fetch: setState inside is the intended data-loading path.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     void load()
   }, [load])
 
