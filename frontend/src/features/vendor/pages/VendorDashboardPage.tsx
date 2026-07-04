@@ -7,6 +7,7 @@ import {
 import { VendorProductManager } from '../components/VendorProductManager'
 import { VendorReviewList } from '../components/VendorReviewList'
 import { VendorStoreSettings } from '../components/VendorStoreSettings'
+import { VendorStoreStats } from '../components/VendorStoreStats'
 import type {
   ManagedStoreSummary,
   VendorReview,
@@ -143,6 +144,9 @@ export function VendorDashboardPage() {
             </select>
           </label>
         )}
+      </article>
+      <article className="card">
+        <VendorStoreStats products={store.products} reviews={reviews} />
       </article>
       <article className="card">
         <VendorStoreSettings
