@@ -1,48 +1,51 @@
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { fetchVendorList } from '../../vendors/api/fetchVendorList'
+import type { VendorListItem } from '../../vendors/vendor.types'
 import './HomePage.css'
 
-type Store = {
-  name: string
-  category: string
-  rating: number
-  description: string
+/** Cantidad maxima de tiendas a destacar en la portada. */
+const FEATURED_LIMIT = 4
+
+type FeaturedState =
+  | { status: 'loading' }
+  | { status: 'error' }
+  | { status: 'loaded'; vendors: VendorListItem[] }
+
+/** Devuelve la primera imagen de producto disponible como logo de la tienda. */
+const getStoreImage = (vendor: VendorListItem): string | null =>
+  vendor.products.find((product) => product.image_url)?.image_url ?? null
+
+/** Recorta la descripcion para la vista breve de la tarjeta. */
+const toShortDescription = (description: string | null): string => {
+  if (!description) return 'Esta tienda todavia no agrego una descripcion.'
+  const trimmed = description.trim()
+  return trimmed.length > 140 ? `${trimmed.slice(0, 140)}...` : trimmed
 }
 
-const stores: Store[] = [
-  {
-    name: 'Moda Marina',
-    category: 'Ropa casual y de playa',
-    rating: 5,
-    description:
-      'Prendas frescas, conjuntos para escapadas de fin de semana y accesorios para un estilo relajado junto al mar.',
-  },
-  {
-    name: 'Sabores del Atrio',
-    category: 'Gastronomía y café',
-    rating: 4,
-    description:
-      'Bebidas artesanales, repostería y opciones para almuerzos rápidos dentro del centro comercial.',
-  },
-  {
-    name: 'Tecnología Azul',
-    category: 'Accesorios y gadgets',
-    rating: 5,
-    description:
-      'Audífonos, cargadores, fundas y pequeños dispositivos para el día a día con soporte personalizado.',
-  },
-  {
-    name: 'Hogar Costero',
-    category: 'Decoración y regalos',
-    rating: 4,
-    description:
-      'Artículos decorativos, sets para el hogar y detalles para regalar en cualquier ocasión especial.',
-  },
-]
-
-const renderStars = (rating: number) =>
-  Array.from({ length: 5 }, (_, index) => index < rating)
-
 export function HomePage() {
+  const [state, setState] = useState<FeaturedState>({ status: 'loading' })
+
+  useEffect(() => {
+    let cancelled = false
+
+    fetchVendorList()
+      .then((vendors) => {
+        if (!cancelled) {
+          setState({ status: 'loaded', vendors: vendors.slice(0, FEATURED_LIMIT) })
+        }
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setState({ status: 'error' })
+        }
+      })
+
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
   return (
     <div className="pa-root">
       {/* Header */}
@@ -80,12 +83,14 @@ export function HomePage() {
 
         <div className="pa-metrics">
           <div className="pa-metric">
-            <div className="pa-metric-val">4.5</div>
-            <div className="pa-metric-lbl">Puntuación general</div>
+            <div className="pa-metric-val">
+              {state.status === 'loaded' ? state.vendors.length : '—'}
+            </div>
+            <div className="pa-metric-lbl">Tiendas destacadas</div>
           </div>
           <div className="pa-metric">
-            <div className="pa-metric-val">4</div>
-            <div className="pa-metric-lbl">Tiendas destacadas</div>
+            <div className="pa-metric-val">100%</div>
+            <div className="pa-metric-lbl">Comercios locales</div>
           </div>
           <div className="pa-metric">
             <div className="pa-metric-val">★</div>
@@ -99,55 +104,76 @@ export function HomePage() {
         <div className="pa-section-head">
           <h2>Tiendas Destacadas</h2>
           <p>
-            Revisa cada local con su calificación y una vista breve de lo que
-            ofrecen.
+            Conoce algunos de los locales del directorio y entra a la tienda que
+            más te llame la atención.
           </p>
         </div>
 
-        <div className="pa-grid">
-          {stores.map((store, index) => (
-            <article className="pa-card" key={store.name}>
-              <span className="pa-card-num" aria-hidden="true">
-                {String(index + 1).padStart(2, '0')}
-              </span>
+        {state.status === 'loading' && (
+          <p className="pa-status">Cargando tiendas...</p>
+        )}
 
-              <p className="pa-cat">{store.category}</p>
-              <h3 className="pa-card-name">{store.name}</h3>
+        {state.status === 'error' && (
+          <p className="pa-status pa-status--error">
+            No se pudieron cargar las tiendas. Intenta de nuevo más tarde.
+          </p>
+        )}
 
-              <div
-                className="pa-stars"
-                aria-label={`Calificación ${store.rating} de 5`}
-              >
-                {renderStars(store.rating).map((isFilled, i) => (
-                  <span
-                    key={`${store.name}-${i}`}
-                    className={`pa-star ${isFilled ? 'pa-star--filled' : 'pa-star--empty'}`}
-                    aria-hidden="true"
-                  >
-                    {isFilled ? '★' : '☆'}
+        {state.status === 'loaded' && state.vendors.length === 0 && (
+          <p className="pa-status">
+            Todavía no hay tiendas disponibles en el directorio.
+          </p>
+        )}
+
+        {state.status === 'loaded' && state.vendors.length > 0 && (
+          <div className="pa-grid">
+            {state.vendors.map((vendor, index) => {
+              const image = getStoreImage(vendor)
+
+              return (
+                <Link
+                  className="pa-card"
+                  to={`/tiendas/${vendor.vendor_id}`}
+                  key={vendor.vendor_id}
+                  aria-label={`Ver la tienda ${vendor.display_name}`}
+                >
+                  <span className="pa-card-num" aria-hidden="true">
+                    {String(index + 1).padStart(2, '0')}
                   </span>
-                ))}
-                <span className="pa-rating-txt">{store.rating}.0 / 5</span>
-              </div>
 
-              <p className="pa-desc">{store.description}</p>
-            </article>
-          ))}
-        </div>
+                  {image ? (
+                    <img
+                      className="pa-card-logo"
+                      src={image}
+                      alt={vendor.display_name}
+                      loading="lazy"
+                    />
+                  ) : (
+                    <div
+                      className="pa-card-logo pa-card-logo--placeholder"
+                      aria-hidden="true"
+                    >
+                      {vendor.display_name.charAt(0).toUpperCase()}
+                    </div>
+                  )}
 
-        <div className="pa-section-cta">
-          <p className="pa-section-cta__text">
-            ¿Quieres ver el catálogo completo con todas las tiendas y sus
-            productos?
-          </p>
-          <Link to="/tiendas" className="pa-btn pa-btn--primary">
-            Explorar el directorio completo
-          </Link>
-        </div>
+                  <h3 className="pa-card-name">{vendor.display_name}</h3>
+                  <p className="pa-desc">
+                    {toShortDescription(vendor.description)}
+                  </p>
+
+                  <span className="pa-card-cta" aria-hidden="true">
+                    Ver tienda →
+                  </span>
+                </Link>
+              )
+            })}
+          </div>
+        )}
       </section>
 
       <footer className="pa-footer">
-        © 2025 Plos Azules · Todos los derechos reservados
+        © 2025 Polos Azules · Todos los derechos reservados
       </footer>
     </div>
   )
