@@ -65,11 +65,14 @@ export function HomePage() {
         </p>
 
         <div className="pa-btn-row">
-          <Link to="/auth/login" className="pa-btn pa-btn--primary">
+          <Link to="/tiendas" className="pa-btn pa-btn--primary">
+            Ver tiendas
+          </Link>
+          <Link to="/auth/login" className="pa-btn pa-btn--secondary">
             Ingresar
           </Link>
-          <a href="#stores" className="pa-btn pa-btn--secondary">
-            Ver tiendas
+          <a href="#stores" className="pa-btn pa-btn--ghost">
+            Destacadas
           </a>
         </div>
 
@@ -130,6 +133,16 @@ export function HomePage() {
               <p className="pa-desc">{store.description}</p>
             </article>
           ))}
+        </div>
+
+        <div className="pa-section-cta">
+          <p className="pa-section-cta__text">
+            ¿Quieres ver el catálogo completo con todas las tiendas y sus
+            productos?
+          </p>
+          <Link to="/tiendas" className="pa-btn pa-btn--primary">
+            Explorar el directorio completo
+          </Link>
         </div>
       </section>
 

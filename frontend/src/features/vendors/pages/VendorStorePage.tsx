@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { Link, useParams } from 'react-router-dom'
 import { fetchVendorProfile } from '../api/fetchVendorProfile'
 import { VendorProductGrid } from '../components/VendorProductGrid'
 import { VendorContactLinks } from '../components/VendorContactLinks'
 import type { VendorProfile } from '../vendor.types'
+import './VendorStorePage.css'
 
 type PageState =
   | { type: 'loading' }
@@ -38,24 +39,51 @@ export function VendorStorePage() {
   }, [vendorId])
 
   if (state.type === 'loading') {
-    return <p>Cargando tienda...</p>
+    return (
+      <div className="vendor-store-page vendor-store-page--status">
+        <p className="vendor-store-page__status">Cargando tienda...</p>
+      </div>
+    )
   }
 
   if (state.type === 'error') {
-    if (state.message === 'Vendedor no encontrado') {
-      return <p>Esta tienda no existe.</p>
-    }
-    return <p>Error al cargar la tienda. Intenta de nuevo.</p>
+    const message =
+      state.message === 'Vendedor no encontrado'
+        ? 'Esta tienda no existe.'
+        : 'Error al cargar la tienda. Intenta de nuevo.'
+
+    return (
+      <div className="vendor-store-page vendor-store-page--status">
+        <p className="vendor-store-page__status">{message}</p>
+        <Link to="/tiendas" className="vendor-store-page__back">
+          ← Volver a las tiendas
+        </Link>
+      </div>
+    )
   }
 
   const { vendor } = state
 
   return (
     <div className="vendor-store-page">
-      <h1>{vendor.display_name}</h1>
-      {vendor.description && <p>{vendor.description}</p>}
+      <Link to="/tiendas" className="vendor-store-page__back">
+        ← Volver a las tiendas
+      </Link>
+
+      <header className="vendor-store-page__header">
+        <p className="vendor-store-page__kicker">Tienda</p>
+        <h1 className="vendor-store-page__title">{vendor.display_name}</h1>
+        {vendor.description && (
+          <p className="vendor-store-page__desc">{vendor.description}</p>
+        )}
+      </header>
+
       <VendorContactLinks contacts={vendor.contacts ?? []} />
-      <VendorProductGrid products={vendor.products} vendorId={vendor.vendor_id} />
+
+      <section className="vendor-store-page__products">
+        <h2 className="vendor-store-page__section-title">Productos</h2>
+        <VendorProductGrid products={vendor.products} vendorId={vendor.vendor_id} />
+      </section>
     </div>
   )
 }
