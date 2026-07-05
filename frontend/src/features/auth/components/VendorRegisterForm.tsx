@@ -29,6 +29,12 @@ export function VendorRegisterForm({ onSuccess }: VendorRegisterFormProps) {
     setCredentials((prev) => ({ ...prev, [field]: value }))
   }
 
+  const handleClear = () => {
+    setCredentials(initialCredentials)
+    setStatus('idle')
+    setFeedback('')
+  }
+
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
 
@@ -104,6 +110,10 @@ export function VendorRegisterForm({ onSuccess }: VendorRegisterFormProps) {
 
       <button type="submit" className="button-link" disabled={status === 'loading'}>
         {status === 'loading' ? 'Creando cuenta...' : 'Crear cuenta'}
+      </button>
+
+      <button type="button" className="button-link button-link--secondary" onClick={handleClear} disabled={status === 'loading'}>
+        Limpiar
       </button>
 
       {feedback && (
