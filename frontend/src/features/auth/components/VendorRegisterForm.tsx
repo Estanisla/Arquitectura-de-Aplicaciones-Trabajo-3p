@@ -17,20 +17,39 @@ const initialCredentials = {
   confirmPassword: '',
 }
 
+type FieldErrors = {
+  username?: string
+  password?: string
+  confirmPassword?: string
+}
+
 export function VendorRegisterForm({ onSuccess }: VendorRegisterFormProps) {
   const [credentials, setCredentials] = useState(initialCredentials)
   const [status, setStatus] = useState<FormStatus>('idle')
   const [feedback, setFeedback] = useState('')
+  const [fieldErrors, setFieldErrors] = useState<FieldErrors>({})
 
   const updateField = (
     field: 'username' | 'password' | 'confirmPassword',
     value: string,
   ) => {
     setCredentials((prev) => ({ ...prev, [field]: value }))
+    if (fieldErrors[field]) {
+      setFieldErrors((prev) => ({ ...prev, [field]: undefined }))
+    }
   }
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
+    setFeedback('')
+
+    const errors: FieldErrors = {}
+    if (!credentials.username.trim()) errors.username = 'Este campo es obligatorio'
+    if (!credentials.password.trim()) errors.password = 'Este campo es obligatorio'
+    if (!credentials.confirmPassword.trim()) errors.confirmPassword = 'Este campo es obligatorio'
+
+    setFieldErrors(errors)
+    if (Object.keys(errors).length > 0) return
 
     if (credentials.password !== credentials.confirmPassword) {
       setStatus('error')
@@ -39,7 +58,6 @@ export function VendorRegisterForm({ onSuccess }: VendorRegisterFormProps) {
     }
 
     setStatus('loading')
-    setFeedback('')
 
     try {
       const result = await registerVendor({
@@ -72,8 +90,10 @@ export function VendorRegisterForm({ onSuccess }: VendorRegisterFormProps) {
           value={credentials.username}
           onChange={(event) => updateField('username', event.target.value)}
           autoComplete="username"
-          required
         />
+        {fieldErrors.username && (
+          <span className="field-error">{fieldErrors.username}</span>
+        )}
       </label>
 
       <label className="field">
@@ -85,8 +105,10 @@ export function VendorRegisterForm({ onSuccess }: VendorRegisterFormProps) {
           onChange={(event) => updateField('password', event.target.value)}
           autoComplete="new-password"
           minLength={6}
-          required
         />
+        {fieldErrors.password && (
+          <span className="field-error">{fieldErrors.password}</span>
+        )}
       </label>
 
       <label className="field">
@@ -98,8 +120,10 @@ export function VendorRegisterForm({ onSuccess }: VendorRegisterFormProps) {
           onChange={(event) => updateField('confirmPassword', event.target.value)}
           autoComplete="new-password"
           minLength={6}
-          required
         />
+        {fieldErrors.confirmPassword && (
+          <span className="field-error">{fieldErrors.confirmPassword}</span>
+        )}
       </label>
 
       <button type="submit" className="button-link" disabled={status === 'loading'}>
