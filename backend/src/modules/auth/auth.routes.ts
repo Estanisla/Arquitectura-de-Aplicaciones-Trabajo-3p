@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { authController } from "./auth.controller.js";
+import { requireRole } from "./auth.middleware.js";
 
 export const authRouter = Router();
 
@@ -8,3 +9,9 @@ authRouter.post("/admin/login", authController.adminLogin);
 authRouter.post("/register", authController.register);
 authRouter.get("/session", authController.session);
 authRouter.post("/logout", authController.logout);
+
+authRouter.get(
+  "/profile",
+  requireRole("vendor", "admin"),
+  authController.profile,
+);

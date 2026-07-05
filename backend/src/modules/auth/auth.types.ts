@@ -30,3 +30,11 @@ export type SessionPayload = {
   sub: string;
   role: AuthRole;
 };
+
+declare global {
+  namespace Express {
+    interface Request {
+      user?: SessionPayload;
+    }
+  }
+}

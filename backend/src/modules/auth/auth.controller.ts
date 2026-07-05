@@ -105,4 +105,13 @@ export const authController = {
       .status(200)
       .json({ ok: true, message: "Sesion cerrada", authenticated: false });
   },
+
+  profile(req: Request, res: Response) {
+    return res.status(200).json({
+      ok: true,
+      message: "Perfil de usuario",
+      user_id: req.user!.sub,
+      role: req.user!.role,
+    });
+  },
 };

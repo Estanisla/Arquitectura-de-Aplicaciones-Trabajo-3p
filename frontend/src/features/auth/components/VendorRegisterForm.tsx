@@ -21,6 +21,11 @@ export function VendorRegisterForm({ onSuccess }: VendorRegisterFormProps) {
   const [status, setStatus] = useState<FormStatus>('idle')
   const [feedback, setFeedback] = useState('')
 
+  const allFieldsFilled =
+    credentials.username.trim() !== '' &&
+    credentials.password.trim() !== '' &&
+    credentials.confirmPassword.trim() !== ''
+
   const updateField = (
     field: 'username' | 'password' | 'confirmPassword',
     value: string,
@@ -103,7 +108,7 @@ export function VendorRegisterForm({ onSuccess }: VendorRegisterFormProps) {
         />
       </label>
 
-      <button type="submit" className="button-link" disabled={status === 'loading'}>
+      <button type="submit" className="button-link" disabled={status === 'loading' || !allFieldsFilled}>
         {status === 'loading' ? 'Creando cuenta...' : 'Crear cuenta'}
       </button>
 
