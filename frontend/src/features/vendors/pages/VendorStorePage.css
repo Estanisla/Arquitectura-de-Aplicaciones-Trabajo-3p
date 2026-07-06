@@ -1,0 +1,191 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Lora:wght@400;500&display=swap');
+
+/* ── Page shell ── */
+.vendor-store-page {
+  font-family: 'Lora', Georgia, serif;
+  background: #f5f0e8;
+  color: #3a2e20;
+  border: 1px solid #c8b890;
+  border-radius: 1rem;
+  padding: 32px 40px 48px;
+  box-shadow: 0 24px 60px rgba(58, 46, 32, 0.14);
+}
+
+.vendor-store-page--status {
+  display: grid;
+  justify-items: center;
+  gap: 20px;
+  padding: 64px 40px;
+  text-align: center;
+}
+
+.vendor-store-page__status {
+  font-size: 16px;
+  color: #7a6440;
+  margin: 0;
+}
+
+/* ── Back link ── */
+.vendor-store-page__back {
+  display: inline-block;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #7a6440;
+  text-decoration: none;
+  margin-bottom: 24px;
+  transition: color 0.2s ease;
+}
+
+.vendor-store-page__back:hover {
+  color: #2a1f10;
+}
+
+/* ── Header ── */
+.vendor-store-page__header {
+  padding-bottom: 24px;
+  border-bottom: 2px solid #b8a882;
+  margin-bottom: 28px;
+}
+
+.vendor-store-page__kicker {
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #9a8060;
+  margin: 0 0 10px;
+}
+
+.vendor-store-page__title {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(2rem, 4vw, 3rem);
+  line-height: 1.1;
+  color: #2a1f10;
+  margin: 0 0 14px;
+}
+
+.vendor-store-page__desc {
+  font-size: 15px;
+  line-height: 1.75;
+  color: #5a4a30;
+  max-width: 640px;
+  margin: 0;
+}
+
+/* ── Contact section (scoped override of global styles) ── */
+.vendor-store-page .store-contact-section {
+  margin: 0 0 32px;
+}
+
+.vendor-store-page .store-contact-section h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 20px;
+  color: #2a1f10;
+  margin: 0;
+}
+
+.vendor-store-page .store-contact-links .button-link {
+  color: #3a2e20;
+  background: #fffdf8;
+  border: 1px solid #b8a882;
+  box-shadow: none;
+  font-family: 'Lora', serif;
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.vendor-store-page .store-contact-links .button-link:hover {
+  background: #3a2e20;
+  color: #f5f0e8;
+  border-color: #3a2e20;
+}
+
+/* ── Products ── */
+.vendor-store-page__section-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 24px;
+  color: #2a1f10;
+  margin: 0 0 20px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #c8b890;
+}
+
+.vendor-product-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 24px;
+}
+
+.vendor-product-grid__card {
+  display: flex;
+  flex-direction: column;
+  background: #fffdf8;
+  border: 1px solid #d8c9a4;
+  border-radius: 0.75rem;
+  overflow: hidden;
+  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.vendor-product-grid__card:hover {
+  border-color: #b8a882;
+  box-shadow: 0 14px 30px rgba(58, 46, 32, 0.14);
+}
+
+.vendor-product-grid__image,
+.vendor-product-grid__placeholder {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  display: block;
+}
+
+.vendor-product-grid__placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #9a8060;
+  background: #ece4d2;
+}
+
+.vendor-product-grid__card h4 {
+  font-family: 'Playfair Display', serif;
+  font-size: 18px;
+  color: #2a1f10;
+  margin: 16px 18px 8px;
+  line-height: 1.25;
+}
+
+.vendor-product-grid__card > p {
+  font-size: 13px;
+  line-height: 1.65;
+  color: #5a4a34;
+  margin: 0 18px 12px;
+}
+
+/* ── Reviews inside product card (scoped override) ── */
+.vendor-product-grid__card .product-reviews {
+  border-top: 1px solid #e4d9bf;
+  margin: auto 18px 0;
+  padding: 14px 0 18px;
+}
+
+.vendor-product-grid__card .review-list {
+  color: #5a4a34;
+  font-size: 13px;
+}
+
+/* ── Responsive ── */
+@media (max-width: 640px) {
+  .vendor-store-page {
+    padding: 24px 22px 32px;
+  }
+
+  .vendor-product-grid {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+}
