@@ -29,6 +29,12 @@ export function VendorLoginForm({
     setCredentials((prev) => ({ ...prev, [field]: value }))
   }
 
+  const handleClear = () => {
+    setCredentials(initialCredentials)
+    setStatus('idle')
+    setFeedback('')
+  }
+
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     setStatus('loading')
@@ -83,6 +89,10 @@ export function VendorLoginForm({
 
       <button type="submit" className="button-link" disabled={status === 'loading'}>
         {status === 'loading' ? 'Validando...' : 'Ingresar'}
+      </button>
+
+      <button type="button" className="button-link button-link--secondary" onClick={handleClear} disabled={status === 'loading'}>
+        Limpiar
       </button>
 
       {feedback && (
