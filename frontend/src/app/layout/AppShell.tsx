@@ -1,8 +1,9 @@
-import { Link, Outlet, useNavigate } from 'react-router-dom'
+import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { useAuthSession } from '../../features/auth/session/useAuthSession'
 
 export function AppShell() {
   const navigate = useNavigate()
+  const location = useLocation()
   const { status, isAuthenticated, logout } = useAuthSession()
 
   const handleLogout = async () => {
@@ -40,7 +41,9 @@ export function AppShell() {
         </nav>
       </header>
       <main className="app-shell__content">
-        <Outlet />
+        <div key={location.pathname} className="route-fade">
+          <Outlet />
+        </div>
       </main>
     </div>
   )

@@ -541,3 +541,28 @@ body {
     padding: 1rem;
   }
 }
+
+/* ── Transicion suave al cambiar de ruta ── */
+.route-fade {
+  display: grid;
+  gap: 1.2rem;
+  animation: route-fade-in 0.28s ease-out both;
+}
+
+@keyframes route-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Accesibilidad: sin animacion si el usuario reduce el movimiento */
+@media (prefers-reduced-motion: reduce) {
+  .route-fade {
+    animation: none;
+  }
+}
