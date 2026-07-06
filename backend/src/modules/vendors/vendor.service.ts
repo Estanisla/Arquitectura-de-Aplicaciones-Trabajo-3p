@@ -5,7 +5,10 @@ import type { VendorListItem, VendorProfile } from "./vendor.types.js";
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 export const vendorService = {
-  /** Retorna la lista de vendedores disponibles */
+  /**
+   * Retorna la lista de vendedores disponibles
+   * @returns Un arreglo con los vendedores más recientes
+   */
   async listVendors(): Promise<VendorListItem[]> {
     return vendorRepository.getVendorList(4);
   },
