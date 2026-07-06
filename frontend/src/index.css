@@ -339,6 +339,11 @@ body {
   font: inherit;
 }
 
+.field-error {
+  color: #b91c1c;
+  font-size: 0.82rem;
+}
+
 .feedback {
   margin: 0;
   font-size: 0.95rem;

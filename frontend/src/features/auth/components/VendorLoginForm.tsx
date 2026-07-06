@@ -17,6 +17,11 @@ const initialCredentials = {
   password: '',
 }
 
+type FieldErrors = {
+  username?: string
+  password?: string
+}
+
 export function VendorLoginForm({
   onSuccess,
   initialFeedback = '',
@@ -24,15 +29,27 @@ export function VendorLoginForm({
   const [credentials, setCredentials] = useState(initialCredentials)
   const [status, setStatus] = useState<FormStatus>('idle')
   const [feedback, setFeedback] = useState(initialFeedback)
+  const [fieldErrors, setFieldErrors] = useState<FieldErrors>({})
 
   const updateField = (field: 'username' | 'password', value: string) => {
     setCredentials((prev) => ({ ...prev, [field]: value }))
+    if (fieldErrors[field]) {
+      setFieldErrors((prev) => ({ ...prev, [field]: undefined }))
+    }
   }
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
-    setStatus('loading')
     setFeedback('')
+
+    const errors: FieldErrors = {}
+    if (!credentials.username.trim()) errors.username = 'Este campo es obligatorio'
+    if (!credentials.password.trim()) errors.password = 'Este campo es obligatorio'
+
+    setFieldErrors(errors)
+    if (Object.keys(errors).length > 0) return
+
+    setStatus('loading')
 
     try {
       const result = await loginVendor(credentials)
@@ -64,8 +81,10 @@ export function VendorLoginForm({
           value={credentials.username}
           onChange={(event) => updateField('username', event.target.value)}
           autoComplete="username"
-          required
         />
+        {fieldErrors.username && (
+          <span className="field-error">{fieldErrors.username}</span>
+        )}
       </label>
 
       <label className="field">
@@ -77,8 +96,10 @@ export function VendorLoginForm({
           onChange={(event) => updateField('password', event.target.value)}
           autoComplete="current-password"
           minLength={6}
-          required
         />
+        {fieldErrors.password && (
+          <span className="field-error">{fieldErrors.password}</span>
+        )}
       </label>
 
       <button type="submit" className="button-link" disabled={status === 'loading'}>
