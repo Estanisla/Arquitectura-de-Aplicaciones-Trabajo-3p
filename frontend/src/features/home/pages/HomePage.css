@@ -348,3 +348,118 @@
   color: #9a8060;
   background: #ede8da;
 }
+
+/* ── Modo oscuro (activado por el boton, via [data-theme='dark']) ── */
+[data-theme='dark'] .pa-root {
+  background: #1c1710;
+  color: #e6dcc6;
+}
+
+[data-theme='dark'] .pa-header {
+  background: #241d13;
+  border-bottom-color: #4a3f2c;
+}
+
+[data-theme='dark'] .pa-logo {
+  color: #f0e6d2;
+}
+
+[data-theme='dark'] .pa-logo em,
+[data-theme='dark'] .pa-h1 em {
+  color: #d4b378;
+}
+
+[data-theme='dark'] .pa-badge {
+  color: #d4b378;
+  border-color: #4a3f2c;
+}
+
+[data-theme='dark'] .pa-kicker {
+  color: #b09a72;
+}
+
+[data-theme='dark'] .pa-h1,
+[data-theme='dark'] .pa-metric-val,
+[data-theme='dark'] .pa-section-head h2,
+[data-theme='dark'] .pa-card-name {
+  color: #f2e8d4;
+}
+
+[data-theme='dark'] .pa-lead {
+  color: #c8b795;
+}
+
+[data-theme='dark'] .pa-divider,
+[data-theme='dark'] .pa-section-head h2 {
+  border-color: #4a3f2c;
+}
+
+[data-theme='dark'] .pa-btn {
+  border-color: #6a5a3c;
+}
+
+[data-theme='dark'] .pa-btn--primary {
+  background: #d4b378;
+  color: #1c1710;
+}
+
+[data-theme='dark'] .pa-btn--primary:hover {
+  background: #e0c48c;
+}
+
+[data-theme='dark'] .pa-btn--secondary {
+  color: #e6dcc6;
+}
+
+[data-theme='dark'] .pa-btn--secondary:hover {
+  background: #2e2618;
+}
+
+[data-theme='dark'] .pa-metric {
+  border-left-color: #6a5a3c;
+}
+
+[data-theme='dark'] .pa-metric-lbl,
+[data-theme='dark'] .pa-rating-txt,
+[data-theme='dark'] .pa-footer {
+  color: #b09a72;
+}
+
+[data-theme='dark'] .pa-section-head p,
+[data-theme='dark'] .pa-desc {
+  color: #c0ad88;
+}
+
+[data-theme='dark'] .pa-grid {
+  background: #4a3f2c;
+  border-color: #4a3f2c;
+}
+
+[data-theme='dark'] .pa-card {
+  background: #241d13;
+}
+
+[data-theme='dark'] .pa-card:hover {
+  background: #2e2618;
+}
+
+[data-theme='dark'] .pa-card-num {
+  color: #4a3f2c;
+}
+
+[data-theme='dark'] .pa-cat {
+  color: #c09a68;
+}
+
+[data-theme='dark'] .pa-star--filled {
+  color: #e0b64d;
+}
+
+[data-theme='dark'] .pa-star--empty {
+  color: #5a4d34;
+}
+
+[data-theme='dark'] .pa-footer {
+  background: #241d13;
+  border-top-color: #4a3f2c;
+}
