@@ -29,8 +29,21 @@ export function VendorRegisterForm({ onSuccess }: VendorRegisterFormProps) {
     setCredentials((prev) => ({ ...prev, [field]: value }))
   }
 
+  const isValidEmail = (value: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)
+  const isValidUsername = (value: string) => /^[a-zA-Z0-9_]{3,30}$/.test(value)
+
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
+
+    const { username } = credentials
+
+    if (!isValidEmail(username) && !isValidUsername(username)) {
+      setStatus('error')
+      setFeedback(
+        'Ingresa un correo electrónico válido o un nombre de usuario (3-30 caracteres, solo letras, números y guion bajo)',
+      )
+      return
+    }
 
     if (credentials.password !== credentials.confirmPassword) {
       setStatus('error')
