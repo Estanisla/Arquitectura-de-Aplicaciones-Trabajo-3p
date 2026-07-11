@@ -82,7 +82,7 @@ export function VendorLoginForm({
       </label>
 
       <button type="submit" className="button-link" disabled={status === 'loading'}>
-        {status === 'loading' ? 'Validando...' : 'Ingresar'}
+        {status === 'loading' ? 'Cargando...' : 'Ingresar'}
       </button>
 
       {feedback && (
